@@ -257,7 +257,6 @@ def generate_dataset(dataset_index):
                            "label": labels[index],
                            "QCat": ["0", "0_0"][index % 2]}
                           for index in range(len(questions))],
-
         }
 
         whole_dict.append(test_dict)

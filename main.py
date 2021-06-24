@@ -83,7 +83,7 @@ def get_model(folder=None, from_scratch=False):
 
 
 def get_device():
-    device_num = 4
+    device_num = 0
     if torch.cuda.is_available():
         dev = torch.device(f"cuda:{device_num}")
         print(f"Running on GPU no. {device_num}")
