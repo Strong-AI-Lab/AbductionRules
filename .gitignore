@@ -1,3 +1,13 @@
+# Datasets; should be generated
+*.jsonl
+# Results; should be generated
+*.txt
+# Only one config file needed, rest can be copied
+/*/config.json
+models/*/config.json
+# Main model supplied; others can be ignored
+*.bin
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
