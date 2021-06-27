@@ -15,7 +15,7 @@ def main():
     for model in all_models:
         for dataset in all_datasets:
             results_file = os.path.join(
-                "datasets", dataset, f"results_{model}.txt")
+                "results", dataset, f"results_{model}.txt")
             if os.path.exists(results_file):
                 with open(results_file) as file:
                     contents = file.read()
