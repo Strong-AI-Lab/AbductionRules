@@ -178,7 +178,7 @@ def train_model(folder, from_scratch=False, test=False):
 
 def test_model(model_folder, test_folder, test=False):
     results_file = os.path.join(
-        "datasets", test_folder, f"results_{model_folder}.txt")
+        "results", test_folder, f"results_{model_folder}.txt")
     if os.path.exists(results_file):
         print(f"{model_folder} model already tested on {test_folder} set, skipping")
         return
@@ -215,6 +215,10 @@ def test_model(model_folder, test_folder, test=False):
             print(
                 f"{as_percent(i, length)} done; {as_percent(successes, total)} accuracy")
 
+    if not os.path.exists("results"):
+        os.mkdir("results")
+    if not os.path.exists(os.path.join("results", test_folder)):
+        os.mkdir(os.path.join("results", test_folder))
     with open(results_file, "w") as file:
         file.writelines(results)
 
@@ -249,6 +253,7 @@ def main():
             test_model(model, dataset, test)
     for test_set in dataset_names:
         test_model("Animal+Person-Simple", test_set, test=test)
+    print_results()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,5 @@
 # Old datasets, should be ignored
-/*/Abduction-Animal-0.*
-# Result files
-*.txt
+/datasets/Abduction-Animal-0.*
 # Only one config file needed, rest can be copied
 /*/config.json
 models/*/config.json
