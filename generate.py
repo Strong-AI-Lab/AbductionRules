@@ -40,7 +40,7 @@ def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_in
     plural = random_bit()
     specific = random_bit()
     also = random_bit()
-    multiplier = int(dataset_index > 4) * 2
+    multiplier = int(dataset_index > 4) + 1
     if also:
         if to_abduce[0:2] == "is":
             as_list = to_abduce.split()
