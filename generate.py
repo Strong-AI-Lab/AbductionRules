@@ -5,7 +5,7 @@ Created 2021-06-01
 @author: Nathan Young
 
 Adapted from PARARULE Plus Depth-5 generation code; Copyright (c) 2021, Qiming Bao. All rights reserved.
-Thanks to Tim Hartill for development of the PARARULE Plus dataset and permission to freely utilise it.
+Thanks to Qiming Bao for development of the PARARULE Plus dataset and permission to freely utilise it.
 ​
 Generates AbductionRules datasets and creates train/dev/test splits thereof.
 ​
