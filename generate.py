@@ -74,42 +74,44 @@ def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_in
     return line
 
 
+animal_names = [
+    'the bald eagle', 'the tiger', 'the bear', 'the lion', 'the wolf',
+    'the crocodile', 'the dinosaur', 'the snake', 'the leopard',
+    'the cheetah', 'the falcon',
+    # 'the fox', 'the cougar',
+]
+animal_names_1 = [
+    'the cat', 'the dog', 'the mouse', 'the rabbit', 'the squirrel', 'the hamster',
+    # 'the deer',
+]
+people_names = ['Anne', 'Alan', 'Bob', 'Charlie',
+                'Dave', 'Erin', 'Harry', 'Gary', 'Fiona']
+
+relations = ['is', 'is not']
+animal_relations = ['likes', 'chases',
+                    'needs', 'visits', 'attacks', 'sees']
+# animal_relations_1 = {
+#     'does not like', 'does not chase', 'does not need', 'does not visit',
+#     'does not eat'
+# }
+animal_attributes_1 = ['kind', 'quiet', 'round', 'nice', 'smart']
+people_attributes_1 = ['big', 'strong', 'high', 'huge', 'heavy']
+animal_attributes_2 = ['dull', 'rough', 'lazy', 'slow',
+                       'sleepy', 'tired', 'reckless', 'boring', 'angry']
+people_attributes_2 = ['short', 'thin', 'small', 'little', 'tiny']
+animal_attributes_3 = ['big', 'strong',
+                       'awful', 'fierce', 'heavy', 'obese']
+people_attributes_3 = ['wealthy', 'smart',
+                       'nice', 'quiet', 'kind', 'clever']
+animal_attributes_4 = ['furry', 'small', 'cute',
+                       'lovely', 'beautiful', 'adorable', 'funny']
+people_attributes_4 = ['poor', 'dull', 'rough', 'bad', 'sad', 'imperfect']
+
+people_attributes_5 = ['old']
+people_attributes_6 = ['young']
+
+
 def generate_dataset(dataset_index):
-    animal_names = [
-        'the bald eagle', 'the tiger', 'the bear', 'the lion', 'the wolf',
-        'the crocodile', 'the dinosaur', 'the snake', 'the leopard',
-        'the cheetah', 'the falcon',
-        # 'the fox', 'the cougar',
-    ]
-    animal_names_1 = [
-        'the cat', 'the dog', 'the mouse', 'the rabbit', 'the squirrel', 'the hamster',
-        # 'the deer',
-    ]
-    people_names = ['Anne', 'Alan', 'Bob', 'Charlie',
-                    'Dave', 'Erin', 'Harry', 'Gary', 'Fiona']
-
-    relations = ['is', 'is not']
-    animal_relations = ['likes', 'chases',
-                        'needs', 'visits', 'attacks', 'sees']
-    # animal_relations_1 = {
-    #     'does not like', 'does not chase', 'does not need', 'does not visit',
-    #     'does not eat'
-    # }
-    animal_attributes_1 = ['kind', 'quiet', 'round', 'nice', 'smart']
-    people_attributes_1 = ['big', 'strong', 'high', 'huge', 'heavy']
-    animal_attributes_2 = ['dull', 'rough', 'lazy', 'slow',
-                           'sleepy', 'tired', 'reckless', 'boring', 'angry']
-    people_attributes_2 = ['short', 'thin', 'small', 'little', 'tiny']
-    animal_attributes_3 = ['big', 'strong',
-                           'awful', 'fierce', 'heavy', 'obese']
-    people_attributes_3 = ['wealthy', 'smart',
-                           'nice', 'quiet', 'kind', 'clever']
-    animal_attributes_4 = ['furry', 'small', 'cute',
-                           'lovely', 'beautiful', 'adorable', 'funny']
-    people_attributes_4 = ['poor', 'dull', 'rough', 'bad', 'sad', 'imperfect']
-
-    people_attributes_5 = ['old']
-    people_attributes_6 = ['young']
 
     if dataset_index <= 4:
         attributes = [[], animal_attributes_1, animal_attributes_2,
