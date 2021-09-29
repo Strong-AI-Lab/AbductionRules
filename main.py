@@ -6,38 +6,37 @@ import shutil
 import torch
 from transformers import Adafactor, T5ForConditionalGeneration, T5Tokenizer
 
+from analysis import as_percent
 from analysis import main as print_results
+from generate import datasets as dataset_names
 from generate import main as generate_datasets
 
 datasets = {}
-dataset_names = ["Abduction-Animal-0.1", "Abduction-Animal-0.2",
-                 "Abduction-Animal-Simple", "Abduction-Animal", "Abduction-Person-Simple", "Abduction-Person"]
-
-
-def as_percent(numerator, denominator, ndigits=1):
-    return str(round(numerator/denominator*100, ndigits=ndigits)) + "%"
+models = dataset_names + ["Zero-Shot"]
 
 
 def sample_two_lists(list1, list2, k):
     return zip(*random.sample(list(zip(list1, list2)), k))
 
 
-def combine_datasets(dataset_names=["Abduction-Animal", "Abduction-Person-Simple"], name="Animal+Person-Simple"):
+def combine_datasets(*indices):
+    name = "+".join([dataset_names[i] for i in indices])
     random.seed(name)
     partitions = ["dev", "train", "test"]
-    combined_set = {}
+    combined_data = {}
     for part in partitions:
-        combined_set[part] = {"inputs": [], "outputs": []}
-        for dataset_name in dataset_names:
-            dataset = datasets[dataset_name]
-            combined_set[part]["inputs"].extend(
+        combined_data[part] = {"inputs": [], "outputs": []}
+        for i in indices:
+            dataset = datasets[dataset_names[i]]
+            combined_data[part]["inputs"].extend(
                 dataset[part]["inputs"])
-            combined_set[part]["outputs"].extend(
+            combined_data[part]["outputs"].extend(
                 dataset[part]["outputs"])
-        length = len(combined_set[part]["inputs"])
-        combined_set[part]["inputs"], combined_set[part]["outputs"] = sample_two_lists(
-            combined_set[part]["inputs"], combined_set[part]["outputs"], length)
-    datasets[name] = combined_set
+        length = len(combined_data[part]["inputs"])
+        combined_data[part]["inputs"], combined_data[part]["outputs"] = sample_two_lists(
+            combined_data[part]["inputs"], combined_data[part]["outputs"], length)
+    datasets[name] = combined_data
+    models.append(name)
 
 
 def generate(text, model, tokenizer, device):
@@ -69,8 +68,8 @@ def add_pararules(folder):
     datasets[folder] = data
 
 
-def get_model(folder=None, from_scratch=False):
-    if folder == None:
+def get_model(folder="Zero-Shot", from_scratch=False):
+    if folder == "Zero-Shot":
         if from_scratch:
             return T5ForConditionalGeneration(return_dict=True)
         return T5ForConditionalGeneration.from_pretrained(
@@ -183,12 +182,13 @@ def test_model(model_folder, test_folder, test=False):
         print(f"{model_folder} model already tested on {test_folder} set, skipping")
         return
 
-    if not os.path.exists(os.path.join("models", model_folder, "pytorch_model.bin")):
-        print(f"{model_folder} model doesn't exist!")
-        train_model(model_folder, test=test)
-        print(f"{model_folder} model trained; testing on {test_folder} set")
-    else:
-        print(f"Testing {model_folder} model on {test_folder} set")
+    if model_folder != "Zero-Shot":
+        if not os.path.exists(os.path.join("models", model_folder, "pytorch_model.bin")):
+            print(f"{model_folder} model doesn't exist!")
+            train_model(model_folder, test=test)
+            print(f"{model_folder} model trained")
+
+    print(f"Testing {model_folder} model on {test_folder} set")
 
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
     model = get_model(model_folder)
@@ -226,33 +226,16 @@ def test_model(model_folder, test_folder, test=False):
         f"FINAL RESULTS: {successes} correct out of {total} ({as_percent(successes, total)})")
 
 
-def train_test_all():
-    generate_datasets()
-    # test = not torch.cuda.is_available()
-    test = False
-    for dataset in dataset_names:
-        add_pararules(dataset)
-    combine_datasets()
-    for model in datasets:
-        for test_set in dataset_names:
-            test_model(model, test_set, test=test)
-    print_results()
-
-
 def main():
     generate_datasets()
-    # test = not torch.cuda.is_available()
     test = False
     for dataset in dataset_names:
         add_pararules(dataset)
-    combine_datasets()
-    simple_models = ["Abduction-Animal-0.1", "Abduction-Animal-0.2",
-                     "Abduction-Animal-Simple", "Abduction-Animal", "Abduction-Person-Simple", ]
-    for model in simple_models:
+    combine_datasets(3, 4)  # Animal+Person-Simple
+    combine_datasets(5, 0)  # Person+Animal-0.1
+    for model in models:
         for dataset in dataset_names:
             test_model(model, dataset, test)
-    for test_set in dataset_names:
-        test_model("Animal+Person-Simple", test_set, test=test)
     print_results()
 
 
