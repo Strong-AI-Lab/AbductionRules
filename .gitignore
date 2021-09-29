@@ -5,6 +5,8 @@
 models/*/config.json
 # Main model supplied; others can be ignored
 *.bin
+# VSCode extras
+/.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
