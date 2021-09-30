@@ -20,7 +20,7 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    name = "+".join([dataset_names[i] for i in indices])
+    name = "+".join([dataset_names[i].removeprefix("Abduction-") for i in indices])
     random.seed(name)
     partitions = ["dev", "train", "test"]
     combined_data = {}
