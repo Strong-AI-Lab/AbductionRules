@@ -101,6 +101,7 @@ def attempt_to_fix(line0: str, line1: str):
         "Erin": ["The eragle", "The etah", "The eagle", "The er", "The ereagle"],
         "Fiona": ["The ficon", "The filion", "The fion"],
         "Harry": ["The h"],
+        "the cheetah": ["Che"],
         "the crocodile": ["Cro"],
         "the squirrel": ["S"],
     }
@@ -131,7 +132,6 @@ def diagnose(line0: str, line1: str):
         if [subject, relation, attribute, obj] == [subject1, relation1, attribute1, object1]:
             return "correct"
         if attribute == attribute1:
-            # return "useful"
             return "salvageable"
         return "incorrect"
 
@@ -250,7 +250,7 @@ def latex_table(rows, caption=None, label=None):
 
 
 def main():
-    criteria = [useful, fixable, correct]
+    criteria = [correct, fixable, useful]
 
     for criterion in criteria:
         category = criterion.__name__.capitalize()
