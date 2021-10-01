@@ -242,34 +242,36 @@ def latex_table(rows, caption=None, label=None):
     """Given a list of lists, converts into a LATEX table."""
     num_cols = max([len(row) for row in rows])
 
-    string_list = ["\\begin{tabular}{|", "c|" * num_cols, "}\n\\hline\n"]
+    string_list = ["\\begin{adjustbox}{max width=\\columnwidth}\n"]
+    string_list += ["\\begin{tabular}{|", "c|" * num_cols, "}\n\\hline\n"]
 
     for row in rows:
         for i in range(num_cols):
             if len(row) > i:
                 if "%" in row[i]:
                     string_list.append("\\cellcolor{blue!")
-                    string_list.append(row[i].removesuffix("%"))
+                    string_list.append(str(float(row[i].removesuffix("%"))/2))
                     string_list.append("}")
                     if rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
                         string_list.append("\\textbf{")
                 string_list.append(str(row[i]))
-                if rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
+                if "%" in row[i] and rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
                         string_list.append("}")
             string_list.append("&")
         string_list[-1] = "\\\\\n\\hline\n"
 
     string_list.append("\\end{tabular}\n")
+    string_list.append("\\end{adjustbox}")
 
     if caption != None:
         string_list.insert(0, "\\begin{table}[t]\n")
-        string_list.append("\\caption{")
+        string_list.append("\n\\caption{")
         if label != None:
             string_list.append("\\label{tab:")
             string_list.append(str(label))
             string_list.append("}")
         string_list.append(str(caption))
-        string_list.append("}\n\\end{table}\n")
+        string_list.append("}\n\\end{table}")
 
     string = "".join(string_list)
     string = string.replace("%", "\\%")
