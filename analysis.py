@@ -5,10 +5,18 @@ from collections import Counter
 import generate
 
 entities = generate.animal_names + generate.animal_names_1 + generate.people_names
-attributes = generate.people_attributes_1 + generate.people_attributes_2 + generate.people_attributes_3 + generate.people_attributes_4 + generate.people_attributes_5 + \
-    generate.people_attributes_6 + generate.animal_attributes_1 + \
-    generate.animal_attributes_2 + \
-    generate.animal_attributes_3 + generate.animal_attributes_4
+attributes = (
+    generate.people_attributes_1
+    + generate.people_attributes_2
+    + generate.people_attributes_3
+    + generate.people_attributes_4
+    + generate.people_attributes_5
+    + generate.people_attributes_6
+    + generate.animal_attributes_1
+    + generate.animal_attributes_2
+    + generate.animal_attributes_3
+    + generate.animal_attributes_4
+)
 relations = generate.animal_relations
 
 
@@ -31,8 +39,8 @@ def decompose(line: str):
         for relation in relations:
             if relation in words:
                 location = words.index(relation)
-                subject = " ".join(words[0: location])
-                obj = " ".join(words[location+1:])
+                subject = " ".join(words[0:location])
+                obj = " ".join(words[location + 1 :])
                 attribute = " ".join(words[location:])
                 break
 
@@ -129,7 +137,12 @@ def diagnose(line0: str, line1: str):
 
     if well_formed(line1):
         subject1, relation1, attribute1, object1 = decompose(line1)
-        if [subject, relation, attribute, obj] == [subject1, relation1, attribute1, object1]:
+        if [subject, relation, attribute, obj] == [
+            subject1,
+            relation1,
+            attribute1,
+            object1,
+        ]:
             return "correct"
         if attribute == attribute1:
             return "salvageable"
@@ -140,7 +153,10 @@ def diagnose(line0: str, line1: str):
         return "fixable and " + diagnose(line0, fixed)
 
     if attribute in line1:
-        return "useful"  # Doesn't cover multiple attributes
+        for other_attribute in attributes:
+            if other_attribute != attribute and other_attribute in line1:
+                return "somewhat useful"
+        return "useful" 
     if relation != "is":
         # Doesn't cover multiple relations or objects
         if relation[:-1] in line1 or obj in line1:
@@ -159,8 +175,13 @@ def fixable(line0, line1):
 
 
 def useful(line0, line1):
-    useful_results = ["correct", "salvageable",
-                      "fixable and correct", "fixable and salvageable", "useful"]
+    useful_results = [
+        "correct",
+        "salvageable",
+        "fixable and correct",
+        "fixable and salvageable",
+        "useful",
+    ]
     return diagnose(line0, line1) in useful_results
 
 
@@ -168,8 +189,7 @@ def classify_answers():
     for model in models:
         for dataset in datasets:
             classes = []
-            results_file = os.path.join(
-                "results", dataset, f"results_{model}.txt")
+            results_file = os.path.join("results", dataset, f"results_{model}.txt")
             if os.path.exists(results_file):
                 with open(results_file) as file:
                     contents = file.readlines()
@@ -177,16 +197,18 @@ def classify_answers():
                 for line in tuples:
                     classes.append(diagnose(line[0], line[1]))
             report = Counter(classes)
-            print(model, "on", dataset+":", report)
+            print(model, "on", dataset + ":", report)
 
 
 def results_table(criterion=correct):
-    table = [["Model \\ Test set"] + datasets]
+    table = [
+        ["Model \\ Test set"]
+        + [dataset.removeprefix("Abduction-") for dataset in datasets]
+    ]
     for model in models:
         row = [model]
         for dataset in datasets:
-            results_file = os.path.join(
-                "results", dataset, f"results_{model}.txt")
+            results_file = os.path.join("results", dataset, f"results_{model}.txt")
             if os.path.exists(results_file):
                 with open(results_file) as file:
                     contents = file.readlines()
@@ -211,8 +233,7 @@ def printable_table(rows):
                 lengths[i] = max(lengths[i], len(item))
             else:
                 lengths[i] = len(item)
-    new_rows = [[item.rjust(lengths[i])
-                 for i, item in enumerate(row)] for row in rows]
+    new_rows = [[item.rjust(lengths[i]) for i, item in enumerate(row)] for row in rows]
     printable = "\n".join([" ".join(row) for row in new_rows])
     return printable
 
@@ -226,7 +247,15 @@ def latex_table(rows, caption=None, label=None):
     for row in rows:
         for i in range(num_cols):
             if len(row) > i:
+                if "%" in row[i]:
+                    string_list.append("\\cellcolor{blue!")
+                    string_list.append(row[i].removesuffix("%"))
+                    string_list.append("}")
+                    if rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
+                        string_list.append("\\textbf{")
                 string_list.append(str(row[i]))
+                if rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
+                        string_list.append("}")
             string_list.append("&")
         string_list[-1] = "\\\\\n\\hline\n"
 
@@ -254,11 +283,11 @@ def main():
 
     for criterion in criteria:
         category = criterion.__name__.capitalize()
-        caption = category + " performance of all models on all test sets."
-        label = category.lower()+"results"
+        caption = category + " performance of all models on all test sets. Results from each model's associated test dataset(s) are bolded."
+        label = category.lower() + "results"
         table = results_table(criterion)
-        to_print = printable_table(table)
-        # to_print = latex_table(table, caption, label)
+        # to_print = printable_table(table)
+        to_print = latex_table(table, caption, label)
         print(caption)
         print(to_print)
         print()
