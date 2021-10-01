@@ -114,14 +114,15 @@ people_attributes_6 = ['young']
 def generate_dataset(dataset_index):
 
     if dataset_index <= 4:
-        attributes = [[], animal_attributes_1, animal_attributes_2,
-                      animal_attributes_3, animal_attributes_4, ]
+        attributes = [[], animal_attributes_1.copy(), animal_attributes_2.copy(),
+                      animal_attributes_3.copy(), animal_attributes_4.copy(), ]
         items = [list(itertools.chain.from_iterable(item)) for item in itertools.product(
             itertools.permutations(animal_names, 2), itertools.permutations(animal_names_1, 2))]
     else:
-        attributes = [[], people_attributes_1, people_attributes_2,
-                      people_attributes_3, people_attributes_4, ]
+        attributes = [[], people_attributes_1.copy(), people_attributes_2.copy(),
+                      people_attributes_3.copy(), people_attributes_4.copy(), ]
         items = itertools.permutations(people_names, 4)
+    relations_2 = animal_relations.copy()
 
     whole_dict = []
     for entry_id, names in enumerate(items):
@@ -131,7 +132,7 @@ def generate_dataset(dataset_index):
         random.shuffle(attributes[2])
         random.shuffle(attributes[3])
         random.shuffle(attributes[4])
-        random.shuffle(animal_relations)
+        random.shuffle(relations_2)
 
         main_relation = relations[0]
 
@@ -151,8 +152,8 @@ def generate_dataset(dataset_index):
 
         if dataset_index <= 4:
             context.extend([
-                f"{names[0]} {animal_relations[0]} {names[2]}.",
-                f"{names[1]} {animal_relations[2]} {names[3]}.",
+                f"{names[0]} {relations_2[0]} {names[2]}.",
+                f"{names[1]} {relations_2[2]} {names[3]}.",
             ])
 
         if dataset_index <= 2:
@@ -161,8 +162,8 @@ def generate_dataset(dataset_index):
                 f"If something is {attributes[2][0]}, {attributes[2][3]}, and {attributes[2][1]} then it is {attributes[2][4]}.",
                 f"If an animal is {attributes[3][3]}, {attributes[3][1]}, and {attributes[3][0]} then it is also {attributes[3][4]}.",
                 f"All animals that are {attributes[4][0]}, {attributes[4][1]}, and {attributes[4][3]} are also {attributes[4][4]}.",
-                f"If something is {attributes[2][2]}, {animal_relations[0]} {names[2]}, and {animal_relations[1]} {names[3]}, then it is {attributes[3][5]}.",
-                f"If something {animal_relations[3]} {names[2]}, {animal_relations[2]} {names[3]}, and is {attributes[3][2]}, then it is {attributes[2][5]}.",
+                f"If something is {attributes[2][2]}, {relations_2[0]} {names[2]}, and {relations_2[1]} {names[3]}, then it is {attributes[3][5]}.",
+                f"If something {relations_2[3]} {names[2]}, {relations_2[2]} {names[3]}, and is {attributes[3][2]}, then it is {attributes[2][5]}.",
             ])
 
         if dataset_index >= 3:
@@ -179,11 +180,11 @@ def generate_dataset(dataset_index):
 
         if 3 <= dataset_index <= 4:
             context.extend([
-                build_context(f"is {attributes[2][2]}", f"{animal_relations[0]} {names[2]}",
-                              f"{animal_relations[1]} {names[3]}", f"is {attributes[3][5]}", dataset_index),
+                build_context(f"is {attributes[2][2]}", f"{relations_2[0]} {names[2]}",
+                              f"{relations_2[1]} {names[3]}", f"is {attributes[3][5]}", dataset_index),
                 # Extra but can be turned into a question
-                build_context(f"is {attributes[3][2]}", f"{animal_relations[3]} {names[2]}",
-                              f"{animal_relations[2]} {names[3]}", f"is {attributes[2][5]}", dataset_index),
+                build_context(f"is {attributes[3][2]}", f"{relations_2[3]} {names[2]}",
+                              f"{relations_2[2]} {names[3]}", f"is {attributes[2][5]}", dataset_index),
             ])
 
         if dataset_index in [4, 6]:
@@ -246,8 +247,8 @@ def generate_dataset(dataset_index):
         ]
         if dataset_index <= 4:
             labels.extend([
-                sentencify(f"{names[0]} {animal_relations[1]} {names[3]}"),
-                sentencify(f"{names[0]} {animal_relations[1]} {names[3]}"),
+                sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
+                sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
             ])
 
         name = datasets[dataset_index-1]
