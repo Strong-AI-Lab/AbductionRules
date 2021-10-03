@@ -25,7 +25,7 @@ def as_percent(numerator, denominator, ndigits=1):
 
 
 datasets = generate.datasets
-models = datasets + ["Animal+Person-Simple", "Person+Animal-0.1", "Zero-Shot"]
+models = datasets + ["Animal+Person-Simple", "Person+Animal-0.1"]
 
 
 def decompose(line: str):

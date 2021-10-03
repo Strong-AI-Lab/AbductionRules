@@ -12,7 +12,7 @@ from generate import datasets as dataset_names
 from generate import main as generate_datasets
 
 datasets = {}
-models = dataset_names + ["Zero-Shot"]
+models = dataset_names.copy()
 
 
 def sample_two_lists(list1, list2, k):
@@ -68,8 +68,8 @@ def add_pararules(folder):
     datasets[folder] = data
 
 
-def get_model(folder="Zero-Shot", from_scratch=False):
-    if folder == "Zero-Shot":
+def get_model(folder=None, from_scratch=False):
+    if folder == None:
         if from_scratch:
             return T5ForConditionalGeneration(return_dict=True)
         return T5ForConditionalGeneration.from_pretrained(
@@ -182,11 +182,10 @@ def test_model(model_folder, test_folder, test=False):
         print(f"{model_folder} model already tested on {test_folder} set, skipping")
         return
 
-    if model_folder != "Zero-Shot":
-        if not os.path.exists(os.path.join("models", model_folder, "pytorch_model.bin")):
-            print(f"{model_folder} model doesn't exist!")
-            train_model(model_folder, test=test)
-            print(f"{model_folder} model trained")
+    if not os.path.exists(os.path.join("models", model_folder, "pytorch_model.bin")):
+        print(f"{model_folder} model doesn't exist!")
+        train_model(model_folder, test=test)
+        print(f"{model_folder} model trained")
 
     print(f"Testing {model_folder} model on {test_folder} set")
 
