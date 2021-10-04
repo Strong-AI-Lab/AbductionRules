@@ -242,7 +242,7 @@ def latex_table(rows, caption=None, label=None):
     """Given a list of lists, converts into a LATEX table."""
     num_cols = max([len(row) for row in rows])
 
-    string_list = ["\\begin{adjustbox}{max width=\\columnwidth}\n"]
+    string_list = ["\\begin{adjustbox}{max width=\\textwidth}\n"]
     string_list += ["\\begin{tabular}{|", "c|" * num_cols, "}\n\\hline\n"]
 
     for row in rows:
@@ -264,14 +264,14 @@ def latex_table(rows, caption=None, label=None):
     string_list.append("\\end{adjustbox}")
 
     if caption != None:
-        string_list.insert(0, "\\begin{table}[t]\n")
+        string_list.insert(0, "\\begin{table*}[t]\n")
         string_list.append("\n\\caption{")
         if label != None:
             string_list.append("\\label{tab:")
             string_list.append(str(label))
             string_list.append("}")
         string_list.append(str(caption))
-        string_list.append("}\n\\end{table}")
+        string_list.append("}\n\\end{table*}")
 
     string = "".join(string_list)
     string = string.replace("%", "\\%")
