@@ -288,8 +288,8 @@ def main():
         caption = category + " performance of all models on all test sets. Results from each model's associated test dataset(s) are bolded."
         label = category.lower() + "results"
         table = results_table(criterion)
-        # to_print = printable_table(table)
-        to_print = latex_table(table, caption, label)
+        to_print = printable_table(table)
+        # to_print = latex_table(table, caption, label)
         print(caption)
         print(to_print)
         print()
