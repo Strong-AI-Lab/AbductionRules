@@ -285,6 +285,8 @@ def write_to_file(index, set, items):
 
 
 def main(include_early=True):
+    dataset_split = [7, 1, 2] # train, dev, test
+
     if include_early:
         set_range = range(1, 7)
     else:
@@ -295,14 +297,16 @@ def main(include_early=True):
         dataset = generate_dataset(i)
         random.shuffle(dataset)
 
-        ten_percent = len(dataset) // 10
-        train = dataset[:ten_percent*7]
-        dev = dataset[ten_percent*7:ten_percent*9]
-        test = dataset[ten_percent*9:]
+        per_unit = len(dataset) // sum(dataset_split)
+        train = dataset_split[0] * per_unit
+        train_dev = sum(dataset_split[:2]) * per_unit
+        train_set = dataset[:train]
+        dev_set = dataset[train:train_dev]
+        test_set = dataset[train_dev:]
 
-        write_to_file(i, "train", train)
-        write_to_file(i, "dev", dev)
-        write_to_file(i, "test", test)
+        write_to_file(i, "train", train_set)
+        write_to_file(i, "dev", dev_set)
+        write_to_file(i, "test", test_set)
 
 
 if __name__ == "__main__":
