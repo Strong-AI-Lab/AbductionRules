@@ -70,6 +70,9 @@ def attempt_to_fix(line0: str, line1: str):
         newline = newline.replace(" is", "")
     line1 = newline
 
+    if line1 == "":
+        return None
+
     # Looping
     words = line1.removesuffix(".").split()
     unique_words = set(words)
@@ -285,7 +288,7 @@ def main():
 
     for criterion in criteria:
         category = criterion.__name__.capitalize()
-        caption = category + " performance of all models on all test sets. Results from each model's associated test dataset(s) are bolded."
+        caption = category + " performance of all models on all test sets. Test sets corresponding to training sets are bolded."
         label = category.lower() + "results"
         table = results_table(criterion)
         to_print = printable_table(table)
