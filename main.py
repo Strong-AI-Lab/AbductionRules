@@ -47,6 +47,14 @@ def generate(text, model, tokenizer, device):
     return tokenizer.decode(outputs[0])
 
 
+def answer_question(context, observation):
+    model = T5ForConditionalGeneration.from_pretrained(os.path.curdir)
+    text = context + "\n" + observation.removeprefix(".") + "?"
+    tokenizer = T5Tokenizer.from_pretrained("t5-base")
+    explanation = generate(text, model, tokenizer, get_device())
+    return explanation[6:-4]
+
+
 def add_pararules(folder):
     if folder in datasets:
         return

@@ -4,7 +4,7 @@
 /*/config.json
 models/*/config.json
 # Main model supplied; others can be ignored
-*.bin
+/models/
 # VSCode extras
 /.vscode/
 
