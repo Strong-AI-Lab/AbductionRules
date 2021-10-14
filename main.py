@@ -62,7 +62,8 @@ def add_pararules(folder):
         for item in raw:
             for question in item["questions"]:
                 data[part]["inputs"].append(
-                    f'{nl.join(item["context"].split())}\n{question["text"][:-1]}?')
+                    f'{item["context"]}\n{question["text"][:-1]}?'
+                )
                 data[part]["outputs"].append(question["label"])
 
     datasets[folder] = data
