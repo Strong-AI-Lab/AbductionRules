@@ -20,7 +20,7 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    name = "+".join([dataset_names[i].removeprefix("Abduction-") for i in indices])
+    name = "+".join([dataset_names[i].replace("Abduction-", "") for i in indices])
     random.seed(name)
     partitions = ["dev", "train", "test"]
     combined_data = {}
@@ -28,13 +28,15 @@ def combine_datasets(*indices):
         combined_data[part] = {"inputs": [], "outputs": []}
         for i in indices:
             dataset = datasets[dataset_names[i]]
-            combined_data[part]["inputs"].extend(
-                dataset[part]["inputs"])
-            combined_data[part]["outputs"].extend(
-                dataset[part]["outputs"])
+            combined_data[part]["inputs"].extend(dataset[part]["inputs"])
+            combined_data[part]["outputs"].extend(dataset[part]["outputs"])
         length = len(combined_data[part]["inputs"])
-        combined_data[part]["inputs"], combined_data[part]["outputs"] = sample_two_lists(
-            combined_data[part]["inputs"], combined_data[part]["outputs"], length)
+        (
+            combined_data[part]["inputs"],
+            combined_data[part]["outputs"],
+        ) = sample_two_lists(
+            combined_data[part]["inputs"], combined_data[part]["outputs"], length
+        )
     datasets[name] = combined_data
     models.append(name)
 
@@ -61,7 +63,6 @@ def add_pararules(folder):
 
     partitions = ["train", "dev", "test"]
     data = {}
-    nl = "\n"
 
     for part in partitions:
         data[part] = {"inputs": [], "outputs": []}
@@ -81,13 +82,12 @@ def get_model(folder=None, from_scratch=False):
     if folder == None:
         if from_scratch:
             return T5ForConditionalGeneration(return_dict=True)
-        return T5ForConditionalGeneration.from_pretrained(
-            "t5-base", return_dict=True)
+        return T5ForConditionalGeneration.from_pretrained("t5-base", return_dict=True)
     if not os.path.exists(os.path.join("models", folder, "config.json")):
-        shutil.copyfile("config.json", os.path.join(
-            "models", folder, "config.json"))
+        shutil.copyfile("config.json", os.path.join("models", folder, "config.json"))
     return T5ForConditionalGeneration.from_pretrained(
-        os.path.join("models", folder), return_dict=True)
+        os.path.join("models", folder), return_dict=True
+    )
 
 
 def get_device():
@@ -150,8 +150,8 @@ def train_model(folder, from_scratch=False, test=False):
         running_loss = 0
 
         for batch in range(batches):
-            inputbatch = inputs[batch * batch_size: (batch+1) * batch_size]
-            labelbatch = labels[batch * batch_size: (batch+1) * batch_size]
+            inputbatch = inputs[batch * batch_size : (batch + 1) * batch_size]
+            labelbatch = labels[batch * batch_size : (batch + 1) * batch_size]
             inputbatch = tokenizer.batch_encode_plus(
                 inputbatch, padding=True, max_length=400, return_tensors="pt"
             )["input_ids"]
@@ -169,7 +169,8 @@ def train_model(folder, from_scratch=False, test=False):
 
             if batch % 100 == 0:
                 print(
-                    f"{batch=} of {batches}; {epoch=} of {epochs}; {as_percent(epoch-1+batch/batches, epochs)} done")
+                    f"{batch=} of {batches}; {epoch=} of {epochs}; {as_percent(epoch-1+batch/batches, epochs)} done"
+                )
 
             loss.backward()
             optimizer.step()
@@ -185,8 +186,7 @@ def train_model(folder, from_scratch=False, test=False):
 
 
 def test_model(model_folder, test_folder, test=False):
-    results_file = os.path.join(
-        "results", test_folder, f"results_{model_folder}.txt")
+    results_file = os.path.join("results", test_folder, f"results_{model_folder}.txt")
     if os.path.exists(results_file):
         print(f"{model_folder} model already tested on {test_folder} set, skipping")
         return
@@ -221,7 +221,8 @@ def test_model(model_folder, test_folder, test=False):
         successes += success
         if i % 100 == 1:
             print(
-                f"{as_percent(i, length)} done; {as_percent(successes, total)} accuracy")
+                f"{as_percent(i, length)} done; {as_percent(successes, total)} accuracy"
+            )
 
     if not os.path.exists("results"):
         os.mkdir("results")
@@ -231,12 +232,13 @@ def test_model(model_folder, test_folder, test=False):
         file.writelines(results)
 
     print(
-        f"FINAL RESULTS: {successes} correct out of {total} ({as_percent(successes, total)})")
+        f"FINAL RESULTS: {successes} correct out of {total} ({as_percent(successes, total)})"
+    )
 
 
 def main():
     generate_datasets()
-    test = False
+    test = True
     for dataset in dataset_names:
         add_pararules(dataset)
     combine_datasets(3, 4)  # Animal+Person-Simple
