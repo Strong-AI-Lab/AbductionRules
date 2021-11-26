@@ -25,7 +25,10 @@ def as_percent(numerator, denominator, ndigits=1):
 
 
 datasets = generate.datasets
-models = datasets + [ "Person+Animal-0.1", "Animal+Person-Simple",]
+models = datasets + [
+    "Person+Animal-0.1",
+    "Animal+Person-Simple",
+]
 
 
 def decompose(line: str):
@@ -83,6 +86,10 @@ def attempt_to_fix(line0: str, line1: str):
         words.insert(index, word)
     line1 = generate.sentencify(" ".join(words))
 
+    # If removing looping worked, no need to continue
+    if well_formed(line1):
+        return line1
+
     # Second kind of looping; sometimes sentences have two 'the's, sometimes not
     words = line1.removesuffix(".").lower().split()
     unique_words = set(words)
@@ -112,9 +119,12 @@ def attempt_to_fix(line0: str, line1: str):
         "Erin": ["The eragle", "The etah", "The eagle", "The er", "The ereagle"],
         "Fiona": ["The ficon", "The filion", "The fion"],
         "Harry": ["The h"],
-        "the cheetah": ["Che"],
-        "the crocodile": ["Cro"],
+        "the cheetah": ["Che", "Cheona"],
+        "the crocodile": ["Cro", "Croona"],
+        "the hamster": ["Ham"],
+        "the mouse": ["Mickey"],  # LOL
         "the squirrel": ["S"],
+        "the tiger": ["T", "Tona"],
     }
     for subject, alias_list in aliases.items():
         for alias in alias_list:
@@ -159,7 +169,7 @@ def diagnose(line0: str, line1: str):
         for other_attribute in attributes:
             if other_attribute != attribute and other_attribute in line1:
                 return "somewhat useful"
-        return "useful" 
+        return "useful"
     if relation != "is":
         # Doesn't cover multiple relations or objects
         if relation[:-1] in line1 or obj in line1:
@@ -203,7 +213,7 @@ def classify_answers():
             print(model, "on", dataset + ":", report)
 
 
-def results_table(criterion=correct):
+def results_table(num=0):
     table = [
         ["Model \\ Test set"]
         + [dataset.removeprefix("Abduction-") for dataset in datasets]
@@ -216,11 +226,20 @@ def results_table(criterion=correct):
                 with open(results_file) as file:
                     contents = file.readlines()
                 tuples = [ast.literal_eval(line) for line in contents]
-                results = [criterion(line[0], line[1]) for line in tuples]
+                results = [criterion(num)(line[0], line[1]) for line in tuples]
                 successes = results.count(True)
                 failures = results.count(False)
                 total = successes + failures
-                row.append(as_percent(successes, total))
+                string = as_percent(successes, total)
+                if num != 0:
+                    proper = [
+                        criterion(num - 1)(line[0], line[1]) for line in tuples
+                    ].count(True)
+                    if proper == successes:
+                        string += " (-)"
+                    else:
+                        string += " (+" + as_percent((successes - proper), total) + ")"
+                row.append(string)
             else:
                 row.append("")
         table.append(row)
@@ -237,7 +256,7 @@ def printable_table(rows):
             else:
                 lengths[i] = len(item)
     new_rows = [[item.rjust(lengths[i]) for i, item in enumerate(row)] for row in rows]
-    printable = "\n".join([" ".join(row) for row in new_rows])
+    printable = "\n".join(["|".join(row) for row in new_rows])
     return printable
 
 
@@ -253,13 +272,15 @@ def latex_table(rows, caption=None, label=None):
             if len(row) > i:
                 if "%" in row[i]:
                     string_list.append("\\cellcolor{blue!")
-                    string_list.append(str(float(row[i].removesuffix("%"))/2))
+                    string_list.append(str(float(row[i].split("%")[0]) / 2))
                     string_list.append("}")
                     if rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
                         string_list.append("\\textbf{")
                 string_list.append(str(row[i]))
-                if "%" in row[i] and rows[0][i] in row[0].removeprefix("Abduction-").split("+"):
-                        string_list.append("}")
+                if "%" in row[i] and rows[0][i] in row[0].removeprefix(
+                    "Abduction-"
+                ).split("+"):
+                    string_list.append("}")
             string_list.append("&")
         string_list[-1] = "\\\\\n\\hline\n"
 
@@ -283,14 +304,25 @@ def latex_table(rows, caption=None, label=None):
     return string
 
 
-def main():
-    criteria = [correct, fixable, useful]
+def criterion(level):
+    return [correct, fixable, useful][level]
 
-    for criterion in criteria:
-        category = criterion.__name__.capitalize()
-        caption = category + " performance of all models on all test sets. Test sets corresponding to training sets are bolded."
+
+def main():
+    for num in range(3):
+        category = criterion(num).__name__.capitalize()
+        caption = "Performance of all models on all test sets"
+        if num == 1:
+            caption += " after allowing lossless errors"
+        if num == 2:
+            caption += " after allowing lossy errors"
+        caption += "."
+        if num > 0:
+            caption = caption.replace("Performance", "Improvement")
+        else:
+            caption += " Test sets corresponding to training sets are bolded."
         label = category.lower() + "results"
-        table = results_table(criterion)
+        table = results_table(num)
         to_print = printable_table(table)
         # to_print = latex_table(table, caption, label)
         print(caption)
