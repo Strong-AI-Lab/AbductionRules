@@ -28,23 +28,29 @@
       "num_beams": 4,
       "prefix": "summarize: "
     },
-    "translation_en_to_de": {
+    "paraphrase_context": {
       "early_stopping": true,
       "max_length": 300,
       "num_beams": 4,
-      "prefix": "translate English to German: "
+      "prefix": "paraphrase context: "
     },
-    "translation_en_to_fr": {
+    "generate_context": {
       "early_stopping": true,
       "max_length": 300,
       "num_beams": 4,
-      "prefix": "translate English to French: "
+      "prefix": "generate context: "
     },
-    "translation_en_to_ro": {
+    "explain_observation": {
       "early_stopping": true,
       "max_length": 300,
       "num_beams": 4,
-      "prefix": "translate English to Romanian: "
+      "prefix": "explain observation: "
+    },
+    "answer_question": {
+      "early_stopping": true,
+      "max_length": 300,
+      "num_beams": 4,
+      "prefix": "answer question: "
     }
   },
   "vocab_size": 32128
