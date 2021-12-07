@@ -238,7 +238,7 @@ def test_model(model_folder, test_folder, test=False):
 
 def main():
     generate_datasets()
-    test = True
+    test = False
     for dataset in dataset_names:
         add_pararules(dataset)
     combine_datasets(3, 4)  # Animal+Person-Simple
