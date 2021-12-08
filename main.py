@@ -51,7 +51,7 @@ def generate(text, model, tokenizer, device):
 
 def answer_question(context, observation):
     model = T5ForConditionalGeneration.from_pretrained(os.path.curdir)
-    text = context + "\n" + observation.removeprefix(".") + "?"
+    text = context + "\n" + observation.removesuffix(".") + "?"
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
     explanation = generate(text, model, tokenizer, get_device())
     return explanation[6:-4]
