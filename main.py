@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import random
@@ -12,7 +13,6 @@ from generate import datasets as dataset_names
 from generate import main as generate_datasets
 
 datasets = {}
-models = dataset_names.copy()
 
 
 def sample_two_lists(list1, list2, k):
@@ -20,25 +20,16 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    name = "+".join([dataset_names[i].replace("Abduction-", "") for i in indices])
+    partitions = ["train", "dev", "test"]
+    parts = [dataset_names[index] for index in indices]
+    name = "+".join([part.replace("Abduction-", "") for part in parts])
     random.seed(name)
-    partitions = ["dev", "train", "test"]
-    combined_data = {}
-    for part in partitions:
-        combined_data[part] = {"inputs": [], "outputs": []}
-        for i in indices:
-            dataset = datasets[dataset_names[i]]
-            combined_data[part]["inputs"].extend(dataset[part]["inputs"])
-            combined_data[part]["outputs"].extend(dataset[part]["outputs"])
-        length = len(combined_data[part]["inputs"])
-        (
-            combined_data[part]["inputs"],
-            combined_data[part]["outputs"],
-        ) = sample_two_lists(
-            combined_data[part]["inputs"], combined_data[part]["outputs"], length
-        )
-    datasets[name] = combined_data
-    models.append(name)
+    datasets[name] = {}
+    for partition in partitions:
+        datasets[name][partition] = list(itertools.chain.from_iterable([datasets[part][partition] for part in parts]))
+        random.shuffle(datasets[name][partition])
+    # datasets[name] = {partition: list(itertools.chain.from_iterable([part[partition] for part in parts])) for partition in partitions}
+    # datasets[name] = list(itertools.chain(*[datasets[part] for part in parts]))
 
 
 def generate(text, model, tokenizer, device):
@@ -49,15 +40,19 @@ def generate(text, model, tokenizer, device):
     return tokenizer.decode(outputs[0])
 
 
+def as_input(context, observation):
+    return context + "\n" + observation.removesuffix(".") + "?"
+
+
 def answer_question(context, observation):
     model = T5ForConditionalGeneration.from_pretrained(os.path.curdir)
-    text = context + "\n" + observation.removesuffix(".") + "?"
+    query = as_input(context, observation)
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
-    explanation = generate(text, model, tokenizer, get_device())
+    explanation = generate(query, model, tokenizer, get_device())
     return explanation[6:-4]
 
 
-def add_pararules(folder):
+def add_dataset(folder):
     if folder in datasets:
         return
 
@@ -65,15 +60,8 @@ def add_pararules(folder):
     data = {}
 
     for part in partitions:
-        data[part] = {"inputs": [], "outputs": []}
         with open(os.path.join("datasets", folder, part + ".jsonl")) as file:
-            raw = [json.loads(line) for line in file.readlines()]
-        for item in raw:
-            for question in item["questions"]:
-                data[part]["inputs"].append(
-                    f'{item["context"]}\n{question["text"][:-1]}?'
-                )
-                data[part]["outputs"].append(question["label"])
+            data[part] = [json.loads(line) for line in file.readlines()]
 
     datasets[folder] = data
 
@@ -103,9 +91,13 @@ def get_device():
 
 
 def get_data(folder, set, test=False):
+    inputs = []
+    labels = []
     dataset = datasets[folder][set]
-    inputs = dataset["inputs"]
-    labels = dataset["outputs"]
+    for item in dataset:
+        for question in item["questions"]:
+            inputs.append(as_input(item["context"], question["text"]))
+            labels.append(question["label"])
     if test:
         inputs, labels = sample_two_lists(inputs, labels, 10)
 
@@ -185,51 +177,58 @@ def train_model(folder, from_scratch=False, test=False):
     torch.save(model.state_dict(), model_location)
 
 
-def test_model(model_folder, test_folder, test=False):
-    results_file = os.path.join("results", test_folder, f"results_{model_folder}.txt")
+def test_model(model_name, test_set, test=False):
+    results_file = os.path.join("results", test_set, f"results_{model_name}.jsonl")
     if os.path.exists(results_file):
-        print(f"{model_folder} model already tested on {test_folder} set, skipping")
+        print(f"{model_name} model already tested on {test_set} set, skipping")
         return
 
-    if not os.path.exists(os.path.join("models", model_folder, "pytorch_model.bin")):
-        print(f"{model_folder} model doesn't exist!")
-        train_model(model_folder, test=test)
-        print(f"{model_folder} model trained")
+    if not os.path.exists(os.path.join("models", model_name, "pytorch_model.bin")):
+        print(f"{model_name} model doesn't exist!")
+        train_model(model_name, test=test)
+        print(f"{model_name} model trained")
 
-    print(f"Testing {model_folder} model on {test_folder} set")
+    print(f"Testing {model_name} model on {test_set} set")
 
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
-    model = get_model(model_folder)
+    model = get_model(model_name)
     dev = get_device()
     model.to(dev)
 
-    inputs, labels = get_data(test_folder, "test", test)
+    dataset = datasets[test_set]["test"]
+    if test:
+        dataset = random.sample(dataset, 1)
 
     results = []
     total = 0
     successes = 0
 
-    length = len(inputs)
-    for i in range(length):
-        question = inputs[i]
-        label = labels[i]
-        output = generate(question, model, tokenizer, dev)[6:-4]
-        success = label == output
-        result = (label, output, success)
-        results.append(str(result) + "\n")
-        total += 1
-        successes += success
-        if i % 100 == 1:
-            print(
-                f"{as_percent(i, length)} done; {as_percent(successes, total)} accuracy"
-            )
+    for item in dataset:
+        for question in item["questions"]:
+            query = as_input(item["context"], question["text"])
+            output = generate(query, model, tokenizer, dev)[6:-4]
+            success = question["label"] == output
+            result = {
+                "id": question["id"],
+                "label": question["label"],
+                "answer": output,
+                "success": success,
+            }
+            results.append(result)
+            successes += success
+            if total % 100 == 1:
+                print(
+                    f"{as_percent(total, len(dataset)*len(item['questions']))} done; {as_percent(successes, total)} accuracy"
+                )
 
     if not os.path.exists("results"):
         os.mkdir("results")
-    if not os.path.exists(os.path.join("results", test_folder)):
-        os.mkdir(os.path.join("results", test_folder))
+    if not os.path.exists(os.path.join("results", test_set)):
+        os.mkdir(os.path.join("results", test_set))
     with open(results_file, "w") as file:
-        file.writelines(results)
+        for result in results:
+            json.dump(result, file)
+            file.write("\n")
 
     print(
         f"FINAL RESULTS: {successes} correct out of {total} ({as_percent(successes, total)})"
@@ -238,12 +237,12 @@ def test_model(model_folder, test_folder, test=False):
 
 def main():
     generate_datasets()
-    test = False
+    test = True
     for dataset in dataset_names:
-        add_pararules(dataset)
+        add_dataset(dataset)
     combine_datasets(3, 4)  # Animal+Person-Simple
     combine_datasets(5, 0)  # Person+Animal-0.1
-    for model in models:
+    for model in datasets:
         for dataset in dataset_names:
             test_model(model, dataset, test)
     print_results()

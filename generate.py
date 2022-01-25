@@ -111,9 +111,9 @@ people_names = [
     "Charlie",
     "Dave",
     "Erin",
-    "Harry",
-    "Gary",
     "Fiona",
+    "Gary",
+    "Harry",
 ]
 
 relations = ["is", "is not"]
@@ -158,7 +158,6 @@ people_attributes_6 = ["young"]
 
 
 def generate_dataset(dataset_index):
-
     if dataset_index <= 4:
         attributes = [
             [],
