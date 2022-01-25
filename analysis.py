@@ -324,7 +324,7 @@ def main():
             caption += " Test sets corresponding to training sets are bolded."
         label = category.lower() + "results"
         table = results_table(num)
-        to_print = printable_table(table)
+        to_print = printable_table(table) # Swap with below for LATEX version in paper
         # to_print = latex_table(table, caption, label)
         print(caption)
         print(to_print)
