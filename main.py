@@ -215,6 +215,7 @@ def test_model(model_name, test_set, test=False):
                 "success": success,
             }
             results.append(result)
+            total += 1
             successes += success
             if total % 100 == 1:
                 print(
