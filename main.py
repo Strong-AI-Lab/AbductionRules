@@ -13,6 +13,7 @@ from generate import datasets as dataset_names
 from generate import main as generate_datasets
 
 datasets = {}
+partitions = ["train", "dev", "test"]
 
 
 def sample_two_lists(list1, list2, k):
@@ -20,7 +21,6 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    partitions = ["train", "dev", "test"]
     parts = [dataset_names[index] for index in indices]
     name = "+".join([part.replace("Abduction-", "") for part in parts])
     random.seed(name)
@@ -28,8 +28,6 @@ def combine_datasets(*indices):
     for partition in partitions:
         datasets[name][partition] = list(itertools.chain.from_iterable([datasets[part][partition] for part in parts]))
         random.shuffle(datasets[name][partition])
-    # datasets[name] = {partition: list(itertools.chain.from_iterable([part[partition] for part in parts])) for partition in partitions}
-    # datasets[name] = list(itertools.chain(*[datasets[part] for part in parts]))
 
 
 def generate(text, model, tokenizer, device):
@@ -55,14 +53,10 @@ def answer_question(context, observation):
 def add_dataset(folder):
     if folder in datasets:
         return
-
-    partitions = ["train", "dev", "test"]
     data = {}
-
     for part in partitions:
         with open(os.path.join("datasets", folder, part + ".jsonl")) as file:
             data[part] = [json.loads(line) for line in file.readlines()]
-
     datasets[folder] = data
 
 
