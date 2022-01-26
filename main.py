@@ -21,12 +21,16 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    parts = [dataset_names[index] for index in indices]
-    name = "+".join([part.replace("Abduction-", "") for part in parts])
+    to_combine = [dataset_names[index] for index in indices]
+    name = "+".join([dataset.replace("Abduction-", "") for dataset in to_combine])
     random.seed(name)
     datasets[name] = {}
     for partition in partitions:
-        datasets[name][partition] = list(itertools.chain.from_iterable([datasets[part][partition] for part in parts]))
+        datasets[name][partition] = list(
+            itertools.chain.from_iterable(
+                [datasets[dataset][partition] for dataset in to_combine]
+            )
+        )
         random.shuffle(datasets[name][partition])
 
 
