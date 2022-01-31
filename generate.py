@@ -42,18 +42,32 @@ def sentencify(sentence):
 
 def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_index):
     attributes = [attribute1, attribute2, attribute3]
+    all_is = True
+    for attribute in attributes:
+        if attribute[:3] != "is ":
+            all_is = False
+            break
     random.shuffle(attributes)
     plural = random_bit()
     specific = random_bit()
     also = random_bit()
     multiplier = int(dataset_index > 4) + 1
+    inverted = random_bit()
     if also:
-        if to_abduce[0:2] == "is":
+        if to_abduce[0:2] == "is" and not inverted:
             as_list = to_abduce.split()
             as_list.insert(1, "also")
             to_abduce = " ".join(as_list)
+            also_text = ""
+        elif inverted and attributes[0][0:2] == "is":
+            as_list = attributes[0].split()
+            as_list.insert(1, "also")
+            attributes[0] = " ".join(as_list)
+            also_text = ""
         else:
-            to_abduce = "also " + to_abduce
+            also_text = "also "
+    else:
+        also_text = ""
     attributes.append(to_abduce)
     if plural:
         fixed = []
@@ -67,15 +81,30 @@ def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_in
                 attribute = "".join(attribute)
             fixed.append(attribute)
         identifier = ["things", "animals", "people"][specific * multiplier]
-        all = "all " * random_bit()
-        line = f"{all}{identifier} that {fixed[0]}, {fixed[1]}, and {fixed[2]}, {fixed[3]}."
-        line = sentencify(line)
+        all = "all " * random_bit() # TODO: every, everything, everyone
+        if random_bit and all_is:
+            attributes[1] = attributes[1].removeprefix("are ")
+            attributes[2] = attributes[2].removeprefix("are ")
+        if not inverted:
+            line = f"{all}{identifier} that {fixed[0]}, {fixed[1]}, and {fixed[2]}, {also_text}{fixed[3]}."
+        else:
+            line = f"{identifier} {fixed[3]} if they {also_text}{fixed[0]}, {fixed[1]}, and {fixed[2]}."
+
     else:
         identifier = ["something", "an animal", "a person"][specific * multiplier]
         then = "then " * random_bit()
-        identifier2 = ["it", "it", "that person"][specific * multiplier]
-        line = f"If {identifier} {attributes[0]}, {attributes[1]}, and {attributes[2]}, {then}{identifier2} {attributes[3]}."
+        identifier2 = ["it", "it", "that person"][specific * multiplier] # TODO: They, it's, they're
+        if random_bit and all_is:
+            attributes[1] = attributes[1].removeprefix("is ")
+            attributes[2] = attributes[2].removeprefix("is ")
+        if not inverted:
+            line = f"If {identifier} {attributes[0]}, {attributes[1]}, and {attributes[2]}, {then}{identifier2} {also_text}{attributes[3]}."
+        else:
+            line = f"{identifier} {attributes[3]} if {identifier2} {also_text}{attributes[0]}, {attributes[1]}, and {attributes[2]}."
 
+    # TODO: Every possible contraction (it is) has a chance of getting contracted?
+
+    line = sentencify(line)
     return line
 
 
@@ -116,7 +145,16 @@ people_names = [
     "Harry",
 ]
 
-relations = ["is", "is not"]
+relations = ["is", "is not",
+"isn't", 
+"is probably", "is probably not", "probably isn't", "probably is not", "probably is",
+"might not be", "might be",
+"can't be", "cannot be", "can be",
+"could be", "couldn't be", "could not be", 
+"is possibly", "possibly is", "possibly isn't", "isn't possibly"
+"is definitely", "definitely isn't", "is definitely not", "definitely is",
+
+]
 animal_relations = ["likes", "chases", "needs", "visits", "attacks", "sees"]
 # animal_relations_1 = {
 #     "does not like",
