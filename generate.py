@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created 2021-06-01
-​
+
 @author: Nathan Young
 
 Adapted from PARARULE Plus Depth-5 generation code; Copyright (c) 2021, Qiming Bao. All rights reserved.
 Thanks to Qiming Bao for development of the PARARULE Plus dataset and permission to freely utilise it.
-​
+
 Generates AbductionRules datasets and creates train/dev/test splits thereof.
-​
+
 """
 
 import itertools
@@ -91,8 +91,8 @@ animal_names = [
     "the leopard",
     "the cheetah",
     "the falcon",
-    # 'the fox',
-    # 'the panther',
+    # "the fox",
+    # "the panther",
 ]
 animal_names_1 = [
     "the cat",
@@ -101,8 +101,8 @@ animal_names_1 = [
     "the rabbit",
     "the squirrel",
     "the hamster",
-    # 'the deer',
-    # 'the cow',
+    # "the deer",
+    # "the cow",
 ]
 people_names = [
     "Anne",
