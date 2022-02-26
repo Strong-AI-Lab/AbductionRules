@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created 2021-06-01
-​
+
 @author: Nathan Young
 
 Adapted from PARARULE Plus Depth-5 generation code; Copyright (c) 2021, Qiming Bao. All rights reserved.
 Thanks to Qiming Bao for development of the PARARULE Plus dataset and permission to freely utilise it.
-​
+
 Generates AbductionRules datasets and creates train/dev/test splits thereof.
-​
+
 """
 
 import itertools
@@ -17,8 +17,6 @@ import random
 import os
 
 datasets = [
-    "Abduction-Animal-0.1",
-    "Abduction-Animal-0.2",
     "Abduction-Animal-Simple",
     "Abduction-Animal",
     "Abduction-Person-Simple",
@@ -40,67 +38,150 @@ def sentencify(sentence):
     return sentence
 
 
-def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_index):
-    attributes = [attribute1, attribute2, attribute3]
+def build_context_fact(entity: str, attribute: str, value: bool = True):
+    # Utimately an exercise in filler language
+    colourful = random_bit()
+    colourful2 = random_bit()
+    positives = [  # TODO: Make these good instead of crap
+        "is definitely",
+        "definitely is",
+        "is certainly",
+        "certainly is",
+        "is absolutely",
+        "absolutely is",
+        "can't not be",
+        "is known to be",
+        "is actually",
+        "has always been",
+        "is always",
+    ]
+    negatives = [
+        "isn't",
+        "can't be",
+        "cannot be",
+        "definitely isn't",
+        "definitely is not",
+        "is definitely not",
+        "can't possibly be",
+        "couldn't possibly be",
+    ]
+    if colourful:
+        relation_set = [negatives, positives][value]
+        relation = random.choice(relation_set)
+    else:
+        relation = ["is not", "is"][value]
+    if colourful2:
+        if value:
+            modifier = random.choice(
+                [
+                    "extremely",
+                    "very",
+                    "quite",
+                    "really",
+                ]
+            )
+        else:
+            modifier = random.choice(
+                [
+                    "at all",
+                    "remotely",
+                ]
+            )
+        line = f"{entity} {relation} {modifier} {attribute}"
+    else:
+        line = f"{entity} {relation} {attribute}"
+
+    line = sentencify(line)
+    return line
+    # Use for answers???
+
+
+def build_attributes(*attributes):
+    # THis is where the "is" (or "are") should be taken out, not in the rule
+    # Also, this is where the 'also' should be decided? Except it can be outside and it can't be both
+    if len(attributes) == 1:
+        return attributes[0]
     all_is = True
     for attribute in attributes:
-        if attribute[:3] != "is ":
+        if attribute[:3] != "is " and attribute[:4] != "are ":
             all_is = False
             break
-    random.shuffle(attributes)
+    if random_bit() and all_is:
+        attributes = list(attributes)
+        for i in range(1, len(attributes)):
+            attributes[i] = attributes[i].removeprefix("is ")
+            attributes[i] = attributes[i].removeprefix("are ")
+    if len(attributes) == 2:
+        return " and ".join(attributes)
+    return ", ".join(attributes[:-1]) + ", and " + attributes[-1]
+
+
+def build_rule(head_attributes, tail_attributes, domain):
+    # TODO: Rename variables for deduction-inclusion
+    # Add prefixes - "everyone knows that", "it's true that", "Surprisingly, " etc
+    # Similar suffixes
+    # Random modifiers - "is" -> "is always", "is certainly", etc
+    # Remember to train a thing to do this as well
+    # head_attributes = [attribute1, attribute2, attribute3]
+    # all_attributes = [attribute1, attribute2, attribute3, to_abduce]
+    if type(head_attributes) == str:
+        head_attributes = [head_attributes]
+    elif type(head_attributes) != list:
+        head_attributes = list(head_attributes)
+    if type(tail_attributes) == str:
+        tail_attributes = [tail_attributes]
+    elif type(tail_attributes) != list:
+        tail_attributes = list(tail_attributes)
+    random.shuffle(head_attributes)
+    random.shuffle(tail_attributes)
     plural = random_bit()
     specific = random_bit()
     also = random_bit()
-    multiplier = int(dataset_index > 4) + 1
+    multiplier = int(domain=="person") + 1
     inverted = random_bit()
     if also:
-        if to_abduce[0:2] == "is" and not inverted:
-            as_list = to_abduce.split()
+        if tail_attributes[0][0:2] == "is" and not inverted:
+            as_list = tail_attributes[0].split()
             as_list.insert(1, "also")
-            to_abduce = " ".join(as_list)
+            tail_attributes[0] = " ".join(as_list)
             also_text = ""
-        elif inverted and attributes[0][0:2] == "is":
-            as_list = attributes[0].split()
+        elif inverted and head_attributes[0][0:2] == "is":
+            as_list = head_attributes[0].split()
             as_list.insert(1, "also")
-            attributes[0] = " ".join(as_list)
+            head_attributes[0] = " ".join(as_list)
             also_text = ""
         else:
             also_text = "also "
     else:
         also_text = ""
-    attributes.append(to_abduce)
     if plural:
-        fixed = []
-        for attribute in attributes:
-            if attribute[0:2] == "is":
-                attribute = "are" + attribute[2:]
-            else:
-                attribute = list(attribute)
-                space = attribute.index(" ")
-                attribute.pop(space - 1)
-                attribute = "".join(attribute)
-            fixed.append(attribute)
+        for attributes in [head_attributes, tail_attributes]:
+            for index, attribute in enumerate(attributes):
+                if attribute[0:2] == "is":
+                    attribute = "are" + attribute[2:]
+                else:
+                    attribute = list(attribute)
+                    space = attribute.index(" ")
+                    attribute.pop(space - 1)
+                    attribute = "".join(attribute)
+                attributes[index] = attribute
         identifier = ["things", "animals", "people"][specific * multiplier]
-        all = "all " * random_bit() # TODO: every, everything, everyone
-        if random_bit and all_is:
-            attributes[1] = attributes[1].removeprefix("are ")
-            attributes[2] = attributes[2].removeprefix("are ")
+        all = "all " * random_bit()  # TODO: every, everything, everyone
         if not inverted:
-            line = f"{all}{identifier} that {fixed[0]}, {fixed[1]}, and {fixed[2]}, {also_text}{fixed[3]}."
+            line = f"{all}{identifier} that {build_attributes(*head_attributes)}, {also_text}{build_attributes(*tail_attributes)}."
         else:
-            line = f"{identifier} {fixed[3]} if they {also_text}{fixed[0]}, {fixed[1]}, and {fixed[2]}."
+            line = f"{identifier} {build_attributes(*tail_attributes)} if they {also_text}{build_attributes(*head_attributes)}."
 
     else:
-        identifier = ["something", "an animal", "a person"][specific * multiplier]
+        identifier = ["something", "an animal", "someone"][specific * multiplier]
         then = "then " * random_bit()
-        identifier2 = ["it", "it", "that person"][specific * multiplier] # TODO: They, it's, they're
-        if random_bit and all_is:
-            attributes[1] = attributes[1].removeprefix("is ")
-            attributes[2] = attributes[2].removeprefix("is ")
+        identifier2 = ["it", "it", "that person"][
+            specific * multiplier
+        ]  # TODO: They, it's, they're - 'they' needs to be plural (stupid English pronouns)
         if not inverted:
-            line = f"If {identifier} {attributes[0]}, {attributes[1]}, and {attributes[2]}, {then}{identifier2} {also_text}{attributes[3]}."
+            line = f"If {identifier} {build_attributes(*head_attributes)}, {then}{identifier2} {also_text}{build_attributes(*tail_attributes)}."
         else:
-            line = f"{identifier} {attributes[3]} if {identifier2} {also_text}{attributes[0]}, {attributes[1]}, and {attributes[2]}."
+            line = f"{identifier} {build_attributes(*tail_attributes)} if {identifier2} {also_text}{build_attributes(*head_attributes)}."
 
     # TODO: Every possible contraction (it is) has a chance of getting contracted?
 
@@ -109,6 +190,7 @@ def build_context(attribute1, attribute2, attribute3, to_abduce: str, dataset_in
 
 
 animal_names = [
+    # TODO: Remove "the"?
     "the bald eagle",
     "the tiger",
     "the bear",
@@ -120,8 +202,11 @@ animal_names = [
     "the leopard",
     "the cheetah",
     "the falcon",
-    # 'the fox',
-    # 'the panther',
+    "the fox",
+    "the panther",
+    "the jaguar",
+    # "the alligator"
+    # the shark??
 ]
 animal_names_1 = [
     "the cat",
@@ -130,8 +215,8 @@ animal_names_1 = [
     "the rabbit",
     "the squirrel",
     "the hamster",
-    # 'the deer',
-    # 'the cow',
+    # "the deer",
+    # "the cow",
 ]
 people_names = [
     "Anne",
@@ -143,27 +228,21 @@ people_names = [
     "Fiona",
     "Gary",
     "Harry",
-]
+]  # TODO: Expand?
 
-relations = ["is", "is not",
-"isn't", 
-"is probably", "is probably not", "probably isn't", "probably is not", "probably is",
-"might not be", "might be",
-"can't be", "cannot be", "can be",
-"could be", "couldn't be", "could not be", 
-"is possibly", "possibly is", "possibly isn't", "isn't possibly"
-"is definitely", "definitely isn't", "is definitely not", "definitely is",
-
+relations = [
+    "is",
+    "is not",
 ]
 animal_relations = ["likes", "chases", "needs", "visits", "attacks", "sees"]
-# animal_relations_1 = {
-#     "does not like",
-#     "does not chase",
-#     "does not need",
-#     "does not visit",
-#     "does not attack",
-#     "does not see",
-# }
+animal_relations_1 = {
+    "does not like",
+    "does not chase",
+    "does not need",
+    "does not visit",
+    "does not attack",
+    "does not see",
+}
 animal_attributes_1 = ["kind", "quiet", "round", "nice", "smart"]
 animal_attributes_2 = [
     "dull",
@@ -195,10 +274,18 @@ people_attributes_5 = ["old"]
 people_attributes_6 = ["young"]
 
 
-def generate_dataset(dataset_index):
-    if dataset_index <= 4:
+def rules_name(logic, domain, extra_rules):
+    return logic.capitalize() + "-" + domain.capitalize() + "-Simple" * (not extra_rules)
+
+
+def generate_dataset(logic="abduction", domain="animal", extra_rules=False):
+    name = rules_name(logic, domain, extra_rules)
+    random.seed(name)
+    # Proposal: just make categories of background facts, rules, and non-background facts, take one category out and make them into questions instead (only one abduction fact of course)
+    # Take out random abduction facts!!!
+    # Either have separate names or randomly assign different instances to de/in/abduction datasets (increase numbers of names to compensate)
+    if domain == "animal":
         attributes = [
-            [],
             animal_attributes_1.copy(),
             animal_attributes_2.copy(),
             animal_attributes_3.copy(),
@@ -211,222 +298,116 @@ def generate_dataset(dataset_index):
                 itertools.permutations(animal_names_1, 2),
             )
         ]
-    else:
+        relations_2 = animal_relations.copy()
+        random.shuffle(relations_2)
+    elif domain == "person":
         attributes = [
-            [],
             people_attributes_1.copy(),
             people_attributes_2.copy(),
             people_attributes_3.copy(),
             people_attributes_4.copy(),
         ]
         items = itertools.permutations(people_names, 4)
-    relations_2 = animal_relations.copy()
 
     whole_dict = []
     for entry_id, names in enumerate(items):
-        entry_id += 1
+        for attribute_list in attributes:
+            random.shuffle(attribute_list)
 
-        random.shuffle(attributes[1])
-        random.shuffle(attributes[2])
-        random.shuffle(attributes[3])
-        random.shuffle(attributes[4])
-        random.shuffle(relations_2)
-
-        main_relation = relations[0]
-
-        context = [
-            f"{names[0]} {relations[0]} {attributes[2][0]}.",
-            f"{names[0]} {relations[0]} {attributes[2][1]}.",
-            f"{names[0]} {relations[0]} {attributes[2][2]}.",
-            f"{names[1]} {relations[0]} {attributes[3][0]}.",
-            f"{names[1]} {relations[0]} {attributes[3][1]}.",
-            f"{names[2]} {relations[0]} {attributes[1][0]}.",
-            f"{names[2]} {relations[0]} {attributes[1][1]}.",
-            f"{names[2]} {relations[0]} {attributes[1][2]}.",
-            f"{names[3]} {relations[0]} {attributes[4][0]}.",
-            f"{names[3]} {relations[0]} {attributes[4][1]}.",
-            f"{names[3]} {relations[0]} {attributes[4][2]}.",
+        facts = [
+            build_context_fact(names[n], attributes[[1, 2, 0, 3][n]][i])
+            for n in range(4)
+            for i in range(3)
         ]
 
-        if dataset_index <= 4:
-            context.extend(
-                [
-                    f"{names[0]} {relations_2[0]} {names[2]}.",
-                    f"{names[1]} {relations_2[2]} {names[3]}.",
-                ]
+        rules = [
+            build_rule(
+                [f"is {attributes[i][j]}" for j in [0, 1, 3]],
+                f"is {attributes[i][4]}",
+                domain,
             )
+            for i in range(4)
+        ]
 
-        if dataset_index <= 2:
-            context.extend(
-                [
-                    f"Things that are {attributes[1][0]}, {attributes[1][1]}, and {attributes[1][3]} are also {attributes[1][4]}.",
-                    f"If something is {attributes[2][0]}, {attributes[2][3]}, and {attributes[2][1]} then it is {attributes[2][4]}.",
-                    f"If an animal is {attributes[3][3]}, {attributes[3][1]}, and {attributes[3][0]} then it is also {attributes[3][4]}.",
-                    f"All animals that are {attributes[4][0]}, {attributes[4][1]}, and {attributes[4][3]} are also {attributes[4][4]}.",
-                    f"If something is {attributes[2][2]}, {relations_2[0]} {names[2]}, and {relations_2[1]} {names[3]}, then it is {attributes[3][5]}.",
-                    f"If something {relations_2[3]} {names[2]}, {relations_2[2]} {names[3]}, and is {attributes[3][2]}, then it is {attributes[2][5]}.",
-                ]
-            )
+        context = facts + rules
 
-        if dataset_index >= 3:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+        questions = [
+            sentencify(f"{names[n]} {relations[r]} {attributes[[1, 2, 0, 3][n]][4]}")
+            for n in range(4)
+            for r in range(2)
+        ]
 
-        if 3 <= dataset_index <= 4:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[2][2]}",
+        labels = [
+            sentencify(f"{names[n]} {relations[0]} {attributes[[1, 2, 0, 3][n]][3]}")
+            for n in range(4)
+            for _ in range(2)
+        ]
+
+        if domain == "animal":
+            context += [
+                f"{names[0]} {relations_2[0]} {names[2]}.",
+                f"{names[1]} {relations_2[2]} {names[3]}.",
+                build_rule(
+                    [
+                        f"is {attributes[1][2]}",
                         f"{relations_2[0]} {names[2]}",
                         f"{relations_2[1]} {names[3]}",
-                        f"is {attributes[3][5]}",
-                        dataset_index,
-                    ),
-                    # Extra but can be turned into a question
-                    build_context(
-                        f"is {attributes[3][2]}",
+                    ],
+                    f"is {attributes[2][5]}",
+                    domain,
+                ),
+                # Extra - could be used to make a question
+                build_rule(
+                    [
+                        f"is {attributes[2][2]}",
                         f"{relations_2[3]} {names[2]}",
                         f"{relations_2[2]} {names[3]}",
-                        f"is {attributes[2][5]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+                    ],
+                    f"is {attributes[1][5]}",
+                    domain,
+                ),
+            ]
 
-        if dataset_index in [4, 6]:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+            questions += [
+                sentencify(f"{names[0]} {relations[0]} {attributes[2][5]}"),
+                sentencify(f"{names[0]} {relations[1]} {attributes[2][5]}"),
+            ]
+
+            labels += [sentencify(f"{names[0]} {relations_2[1]} {names[3]}")] * 2
+
+        if extra_rules:
+            # TODO: Make these only have a chance of showing up, so that they can't be relied on
+            # TODO: Make these change to random attribute lists
+            context += [
+                build_rule(
+                    [
+                        f"is {attributes[i][0]}",
+                        f"is {attributes[(i+1)%4][1]}",
+                        f"is {attributes[i][3]}",
+                    ],
+                    f"is {attributes[i][4]}",
+                    domain,
+                )
+                for i in range(4)
+            ]
+
+            context += [
+                build_rule(
+                    [
+                        f"is {attributes[i][0]}",
+                        f"is {attributes[(i+1)%4][1]}",
+                        f"is {attributes[(i+2)%4][3]}",
+                    ],
+                    f"is {attributes[(i+3)%4][4]}",
+                    domain,
+                )
+                for i in range(4)
+            ]
 
         for index in range(len(context)):
             context[index] = sentencify(context[index])
-        if dataset_index > 1:
-            random.shuffle(context)
+        random.shuffle(context)
 
-        questions = [
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][4]}"),
-            sentencify(f"{names[2]} {relations[1]} {attributes[1][4]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][4]}"),
-            sentencify(f"{names[0]} {relations[1]} {attributes[2][4]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][4]}"),
-            sentencify(f"{names[1]} {relations[1]} {attributes[3][4]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][4]}"),
-            sentencify(f"{names[3]} {relations[1]} {attributes[4][4]}"),
-        ]
-        if dataset_index <= 4:
-            questions.extend(
-                [
-                    sentencify(f"{names[0]} {relations[0]} {attributes[3][5]}"),
-                    sentencify(f"{names[0]} {relations[1]} {attributes[3][5]}"),
-                ]
-            )
-
-        labels = [
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][3]}"),
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][3]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][3]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][3]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][3]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][3]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][3]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][3]}"),
-        ]
-        if dataset_index <= 4:
-            labels.extend(
-                [
-                    sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
-                    sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
-                ]
-            )
-
-        name = datasets[dataset_index - 1]
         test_dict = {
             "id": f"{name}-{entry_id}",
             "context": " ".join(context),
@@ -451,8 +432,7 @@ def set_default(obj):
     raise TypeError
 
 
-def write_to_file(index, set, items):
-    name = datasets[index - 1]
+def write_to_file(name, set, items):
     if not os.path.exists("datasets"):
         os.mkdir("datasets")
     if not os.path.exists(os.path.join("datasets", name)):
@@ -463,29 +443,25 @@ def write_to_file(index, set, items):
             file.write("\n")
 
 
-def main(include_early=True):
+def main():
     dataset_split = [7, 1, 2]  # train, dev, test
 
-    if include_early:
-        set_range = range(1, 7)
-    else:
-        set_range = range(3, 7)
+    for domain in ["animal", "person"]:
+        for extra_rules in [False, True]:
+            dataset = generate_dataset("abduction", domain, extra_rules)
+            random.shuffle(dataset)
 
-    for i in set_range:
-        random.seed(datasets[i - 1])
-        dataset = generate_dataset(i)
-        random.shuffle(dataset)
+            per_unit = len(dataset) // sum(dataset_split)
+            train = dataset_split[0] * per_unit
+            train_dev = sum(dataset_split[:2]) * per_unit
+            train_set = dataset[:train]
+            dev_set = dataset[train:train_dev]
+            test_set = dataset[train_dev:]
 
-        per_unit = len(dataset) // sum(dataset_split)
-        train = dataset_split[0] * per_unit
-        train_dev = sum(dataset_split[:2]) * per_unit
-        train_set = dataset[:train]
-        dev_set = dataset[train:train_dev]
-        test_set = dataset[train_dev:]
-
-        write_to_file(i, "train", train_set)
-        write_to_file(i, "dev", dev_set)
-        write_to_file(i, "test", test_set)
+            name = rules_name("abduction", domain, extra_rules)
+            write_to_file(name, "train", train_set)
+            write_to_file(name, "dev", dev_set)
+            write_to_file(name, "test", test_set)
 
 
 if __name__ == "__main__":
