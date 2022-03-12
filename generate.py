@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created 2021-06-01
-​
+
 @author: Nathan Young
 
 Adapted from PARARULE Plus Depth-5 generation code; Copyright (c) 2021, Qiming Bao. All rights reserved.
 Thanks to Qiming Bao for development of the PARARULE Plus dataset and permission to freely utilise it.
-​
+
 Generates AbductionRules datasets and creates train/dev/test splits thereof.
-​
+
 """
 
 import itertools
@@ -91,8 +91,8 @@ animal_names = [
     "the leopard",
     "the cheetah",
     "the falcon",
-    # 'the fox',
-    # 'the panther',
+    # "the fox",
+    # "the panther",
 ]
 animal_names_1 = [
     "the cat",
@@ -101,8 +101,8 @@ animal_names_1 = [
     "the rabbit",
     "the squirrel",
     "the hamster",
-    # 'the deer',
-    # 'the cow',
+    # "the deer",
+    # "the cow",
 ]
 people_names = [
     "Anne",
@@ -158,10 +158,8 @@ people_attributes_6 = ["young"]
 
 
 def generate_dataset(dataset_index):
-
     if dataset_index <= 4:
         attributes = [
-            [],
             animal_attributes_1.copy(),
             animal_attributes_2.copy(),
             animal_attributes_3.copy(),
@@ -176,7 +174,6 @@ def generate_dataset(dataset_index):
         ]
     else:
         attributes = [
-            [],
             people_attributes_1.copy(),
             people_attributes_2.copy(),
             people_attributes_3.copy(),
@@ -189,205 +186,110 @@ def generate_dataset(dataset_index):
     for entry_id, names in enumerate(items):
         entry_id += 1
 
-        random.shuffle(attributes[1])
-        random.shuffle(attributes[2])
-        random.shuffle(attributes[3])
-        random.shuffle(attributes[4])
+        for attribute_list in attributes:
+            random.shuffle(attribute_list)
         random.shuffle(relations_2)
 
         main_relation = relations[0]
 
         context = [
-            f"{names[0]} {relations[0]} {attributes[2][0]}.",
-            f"{names[0]} {relations[0]} {attributes[2][1]}.",
-            f"{names[0]} {relations[0]} {attributes[2][2]}.",
-            f"{names[1]} {relations[0]} {attributes[3][0]}.",
-            f"{names[1]} {relations[0]} {attributes[3][1]}.",
-            f"{names[2]} {relations[0]} {attributes[1][0]}.",
-            f"{names[2]} {relations[0]} {attributes[1][1]}.",
-            f"{names[2]} {relations[0]} {attributes[1][2]}.",
-            f"{names[3]} {relations[0]} {attributes[4][0]}.",
-            f"{names[3]} {relations[0]} {attributes[4][1]}.",
-            f"{names[3]} {relations[0]} {attributes[4][2]}.",
+            f"{names[n]} {relations[0]} {attributes[[1, 2, 0, 3][n]][a]}."
+            for n in range(4)
+            for a in range(3)
         ]
+        context.remove(f"{names[1]} {relations[0]} {attributes[2][2]}.")
 
         if dataset_index <= 4:
-            context.extend(
-                [
-                    f"{names[0]} {relations_2[0]} {names[2]}.",
-                    f"{names[1]} {relations_2[2]} {names[3]}.",
-                ]
-            )
+            context += [
+                f"{names[0]} {relations_2[0]} {names[2]}.",
+                f"{names[1]} {relations_2[2]} {names[3]}.",
+            ]
 
         if dataset_index <= 2:
-            context.extend(
-                [
-                    f"Things that are {attributes[1][0]}, {attributes[1][1]}, and {attributes[1][3]} are also {attributes[1][4]}.",
-                    f"If something is {attributes[2][0]}, {attributes[2][3]}, and {attributes[2][1]} then it is {attributes[2][4]}.",
-                    f"If an animal is {attributes[3][3]}, {attributes[3][1]}, and {attributes[3][0]} then it is also {attributes[3][4]}.",
-                    f"All animals that are {attributes[4][0]}, {attributes[4][1]}, and {attributes[4][3]} are also {attributes[4][4]}.",
-                    f"If something is {attributes[2][2]}, {relations_2[0]} {names[2]}, and {relations_2[1]} {names[3]}, then it is {attributes[3][5]}.",
-                    f"If something {relations_2[3]} {names[2]}, {relations_2[2]} {names[3]}, and is {attributes[3][2]}, then it is {attributes[2][5]}.",
-                ]
-            )
+            context += [
+                f"Things that are {attributes[0][0]}, {attributes[0][1]}, and {attributes[0][3]} are also {attributes[0][4]}.",
+                f"If something is {attributes[1][0]}, {attributes[1][3]}, and {attributes[1][1]} then it is {attributes[1][4]}.",
+                f"If an animal is {attributes[2][3]}, {attributes[2][1]}, and {attributes[2][0]} then it is also {attributes[2][4]}.",
+                f"All animals that are {attributes[3][0]}, {attributes[3][1]}, and {attributes[3][3]} are also {attributes[3][4]}.",
+                f"If something is {attributes[1][2]}, {relations_2[0]} {names[2]}, and {relations_2[1]} {names[3]}, then it is {attributes[2][5]}.",
+                f"If something {relations_2[3]} {names[2]}, {relations_2[2]} {names[3]}, and is {attributes[2][2]}, then it is {attributes[1][5]}.",
+            ]
 
         if dataset_index >= 3:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+            context += [
+                build_context(
+                    f"is {attributes[i][0]}",
+                    f"is {attributes[i][1]}",
+                    f"is {attributes[i][3]}",
+                    f"is {attributes[i][4]}",
+                    dataset_index,
+                )
+                for i in range(4)
+            ]
 
         if 3 <= dataset_index <= 4:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[2][2]}",
-                        f"{relations_2[0]} {names[2]}",
-                        f"{relations_2[1]} {names[3]}",
-                        f"is {attributes[3][5]}",
-                        dataset_index,
-                    ),
-                    # Extra but can be turned into a question
-                    build_context(
-                        f"is {attributes[3][2]}",
-                        f"{relations_2[3]} {names[2]}",
-                        f"{relations_2[2]} {names[3]}",
-                        f"is {attributes[2][5]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+            context += [
+                build_context(
+                    f"is {attributes[1][2]}",
+                    f"{relations_2[0]} {names[2]}",
+                    f"{relations_2[1]} {names[3]}",
+                    f"is {attributes[2][5]}",
+                    dataset_index,
+                ),
+                # Extra but can be turned into a question
+                build_context(
+                    f"is {attributes[2][2]}",
+                    f"{relations_2[3]} {names[2]}",
+                    f"{relations_2[2]} {names[3]}",
+                    f"is {attributes[1][5]}",
+                    dataset_index,
+                ),
+            ]
 
         if dataset_index in [4, 6]:
-            context.extend(
-                [
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[1][0]}",
-                        f"is {attributes[2][1]}",
-                        f"is {attributes[3][3]}",
-                        f"is {attributes[4][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[4][0]}",
-                        f"is {attributes[1][1]}",
-                        f"is {attributes[2][3]}",
-                        f"is {attributes[3][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[3][0]}",
-                        f"is {attributes[4][1]}",
-                        f"is {attributes[1][3]}",
-                        f"is {attributes[2][4]}",
-                        dataset_index,
-                    ),
-                    build_context(
-                        f"is {attributes[2][0]}",
-                        f"is {attributes[3][1]}",
-                        f"is {attributes[4][3]}",
-                        f"is {attributes[1][4]}",
-                        dataset_index,
-                    ),
-                ]
-            )
+            context += [
+                build_context(
+                    f"is {attributes[i][0]}",
+                    f"is {attributes[(i+1)%4][1]}",
+                    f"is {attributes[i][3]}",
+                    f"is {attributes[i][4]}",
+                    dataset_index,
+                )
+                for i in range(4)
+            ]
+            context += [
+                build_context(
+                    f"is {attributes[-i%4][0]}",
+                    f"is {attributes[(1-i)%4][1]}",
+                    f"is {attributes[(2-i)%4][3]}",
+                    f"is {attributes[(3-i)%4][4]}",
+                    dataset_index,
+                )
+                for i in range(4)
+            ]
 
-        for index in range(len(context)):
-            context[index] = sentencify(context[index])
+        questions = []
+        labels = []
+
+        for attr, name in enumerate([2, 0, 1, 3]):
+            questions.append(f"{names[name]} {relations[0]} {attributes[attr][4]}")
+            questions.append(f"{names[name]} {relations[1]} {attributes[attr][4]}")
+            labels += [f"{names[name]} {relations[0]} {attributes[attr][3]}"] * 2
+
+        if dataset_index <= 4:
+            questions += [
+                f"{names[0]} {relations[0]} {attributes[2][5]}",
+                f"{names[0]} {relations[1]} {attributes[2][5]}",
+            ]
+            labels += [f"{names[0]} {relations_2[1]} {names[3]}"] * 2
+
         if dataset_index > 1:
             random.shuffle(context)
-
-        questions = [
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][4]}"),
-            sentencify(f"{names[2]} {relations[1]} {attributes[1][4]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][4]}"),
-            sentencify(f"{names[0]} {relations[1]} {attributes[2][4]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][4]}"),
-            sentencify(f"{names[1]} {relations[1]} {attributes[3][4]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][4]}"),
-            sentencify(f"{names[3]} {relations[1]} {attributes[4][4]}"),
-        ]
-        if dataset_index <= 4:
-            questions.extend(
-                [
-                    sentencify(f"{names[0]} {relations[0]} {attributes[3][5]}"),
-                    sentencify(f"{names[0]} {relations[1]} {attributes[3][5]}"),
-                ]
-            )
-
-        labels = [
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][3]}"),
-            sentencify(f"{names[2]} {relations[0]} {attributes[1][3]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][3]}"),
-            sentencify(f"{names[0]} {relations[0]} {attributes[2][3]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][3]}"),
-            sentencify(f"{names[1]} {relations[0]} {attributes[3][3]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][3]}"),
-            sentencify(f"{names[3]} {relations[0]} {attributes[4][3]}"),
-        ]
-        if dataset_index <= 4:
-            labels.extend(
-                [
-                    sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
-                    sentencify(f"{names[0]} {relations_2[1]} {names[3]}"),
-                ]
-            )
+        for i in range(len(context)):
+            context[i] = sentencify(context[i])
+        for i in range(len(questions)):
+            questions[i] = sentencify(questions[i])
+            labels[i] = sentencify(labels[i])
 
         name = datasets[dataset_index - 1]
         test_dict = {
@@ -441,10 +343,10 @@ def main(include_early=True):
 
         per_unit = len(dataset) // sum(dataset_split)
         train = dataset_split[0] * per_unit
-        train_dev = sum(dataset_split[:2]) * per_unit
+        dev = dataset_split[1] * per_unit
         train_set = dataset[:train]
-        dev_set = dataset[train:train_dev]
-        test_set = dataset[train_dev:]
+        dev_set = dataset[train : train + dev]
+        test_set = dataset[train + dev :]
 
         write_to_file(i, "train", train_set)
         write_to_file(i, "dev", dev_set)

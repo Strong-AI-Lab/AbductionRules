@@ -1,4 +1,4 @@
-import ast
+import json
 import os
 from collections import Counter
 
@@ -28,6 +28,7 @@ datasets = generate.datasets
 models = datasets + [
     "Person+Animal-0.1",
     "Animal+Person-Simple",
+    "Zero-Shot",
 ]
 
 
@@ -202,13 +203,13 @@ def classify_answers():
     for model in models:
         for dataset in datasets:
             classes = []
-            results_file = os.path.join("results", dataset, f"results_{model}.txt")
+            results_file = os.path.join("results", dataset, f"results_{model}.jsonl")
             if os.path.exists(results_file):
                 with open(results_file) as file:
                     contents = file.readlines()
-                tuples = [ast.literal_eval(line) for line in contents]
+                tuples = [json.loads(line) for line in contents]
                 for line in tuples:
-                    classes.append(diagnose(line[0], line[1]))
+                    classes.append(diagnose(line["label"], line["answer"]))
             report = Counter(classes)
             print(model, "on", dataset + ":", report)
 
@@ -221,19 +222,19 @@ def results_table(num=0):
     for model in models:
         row = [model]
         for dataset in datasets:
-            results_file = os.path.join("results", dataset, f"results_{model}.txt")
+            results_file = os.path.join("results", dataset, f"results_{model}.jsonl")
             if os.path.exists(results_file):
                 with open(results_file) as file:
                     contents = file.readlines()
-                tuples = [ast.literal_eval(line) for line in contents]
-                results = [criterion(num)(line[0], line[1]) for line in tuples]
+                answers = [json.loads(line) for line in contents]
+                results = [criterion(num)(line["label"], line["answer"]) for line in answers]
                 successes = results.count(True)
                 failures = results.count(False)
                 total = successes + failures
                 string = as_percent(successes, total)
                 if num != 0:
                     proper = [
-                        criterion(num - 1)(line[0], line[1]) for line in tuples
+                        criterion(num - 1)(line["label"], line["answer"]) for line in answers
                     ].count(True)
                     if proper == successes:
                         string += " (-)"
