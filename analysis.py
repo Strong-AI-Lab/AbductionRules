@@ -28,7 +28,7 @@ datasets = generate.datasets
 models = datasets + [
     "Person+Animal-0.1",
     "Animal+Person-Simple",
-    "Zero-Shot",
+    "Untrained",
 ]
 
 

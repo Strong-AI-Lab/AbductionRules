@@ -13,7 +13,7 @@ from generate import datasets as dataset_names
 from generate import main as generate_datasets
 
 datasets = {}
-models = dataset_names + ["Zero-Shot"]
+models = dataset_names + ["Untrained"]
 
 
 def sample_two_lists(list1, list2, k):
@@ -193,7 +193,7 @@ def test_model(model_name, test_set, test=False):
         print(f"{model_name} model already tested on {test_set} set, skipping")
         return
 
-    if model_name == "Zero-Shot":
+    if model_name == "Untrained":
         model = T5ForConditionalGeneration.from_pretrained("t5-base", return_dict=True)
     else:
         if not os.path.exists(os.path.join("models", model_name, "pytorch_model.bin")):
