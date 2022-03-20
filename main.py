@@ -239,8 +239,8 @@ def main():
     test = True
     for dataset in dataset_names:
         add_dataset(dataset)
-    combine_datasets(3, 4)  # Animal+Person-Simple
-    combine_datasets(5, 0)  # Person+Animal-0.1
+    combine_datasets(1, 2)  # Animal+Person-Simple
+    combine_datasets(3, 0)  # Person+Animal-Simple
     for model in datasets:
         for dataset in dataset_names:
             test_model(model, dataset, test)

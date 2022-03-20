@@ -27,7 +27,7 @@ def as_percent(numerator, denominator, ndigits=1):
 
 datasets = generate.datasets
 models = datasets + [
-    "Person+Animal-0.1",
+    "Person+Animal-Simple",
     "Animal+Person-Simple",
 ]
 
