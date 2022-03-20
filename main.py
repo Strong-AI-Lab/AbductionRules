@@ -14,6 +14,7 @@ from generate import main as generate_datasets
 
 datasets = {}
 partitions = ["train", "dev", "test"]
+models = dataset_names + ["Untrained"]
 
 
 def sample_two_lists(list1, list2, k):
@@ -21,15 +22,14 @@ def sample_two_lists(list1, list2, k):
 
 
 def combine_datasets(*indices):
-    to_combine = [dataset_names[index] for index in indices]
-    name = "+".join([dataset.replace("Abduction-", "") for dataset in to_combine])
+    parts = [dataset_names[index] for index in indices]
+    name = "+".join([part.replace("Abduction-", "") for part in parts])
+    models.append(name)
     random.seed(name)
     datasets[name] = {}
     for partition in partitions:
         datasets[name][partition] = list(
-            itertools.chain.from_iterable(
-                [datasets[dataset][partition] for dataset in to_combine]
-            )
+            itertools.chain.from_iterable([datasets[part][partition] for part in parts])
         )
         random.shuffle(datasets[name][partition])
 
@@ -39,7 +39,19 @@ def generate(text, model, tokenizer, device):
     input_ids = tokenizer.encode(text, return_tensors="pt")
     input_ids = input_ids.to(device)
     outputs = model.generate(input_ids)
-    return tokenizer.decode(outputs[0])
+    return as_output(tokenizer.decode(outputs[0]))
+
+
+def as_input(context, observation):
+    return context + "\n" + observation.removesuffix(".") + "?"
+
+
+def as_output(raw: str):
+    while "<" in raw:
+        beginning = raw.find("<")
+        end = raw.find(">")
+        raw = raw[:beginning] + raw[end + 1 :]
+    return raw.strip()
 
 
 def as_input(context, observation):
@@ -51,7 +63,7 @@ def answer_question(context, observation):
     query = as_input(context, observation)
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
     explanation = generate(query, model, tokenizer, get_device())
-    return explanation[6:-4]
+    return explanation
 
 
 def add_dataset(folder):
@@ -181,15 +193,18 @@ def test_model(model_name, test_set, test=False):
         print(f"{model_name} model already tested on {test_set} set, skipping")
         return
 
-    if not os.path.exists(os.path.join("models", model_name, "pytorch_model.bin")):
-        print(f"{model_name} model doesn't exist!")
-        train_model(model_name, test=test)
-        print(f"{model_name} model trained")
+    if model_name == "Untrained":
+        model = T5ForConditionalGeneration.from_pretrained("t5-base", return_dict=True)
+    else:
+        if not os.path.exists(os.path.join("models", model_name, "pytorch_model.bin")):
+            print(f"{model_name} model doesn't exist!")
+            train_model(model_name, test=test)
+            print(f"{model_name} model trained")
+        model = get_model(model_name)
 
     print(f"Testing {model_name} model on {test_set} set")
 
     tokenizer = T5Tokenizer.from_pretrained("t5-base")
-    model = get_model(model_name)
     dev = get_device()
     model.to(dev)
 
@@ -204,7 +219,7 @@ def test_model(model_name, test_set, test=False):
     for item in dataset:
         for question in item["questions"]:
             query = as_input(item["context"], question["text"])
-            output = generate(query, model, tokenizer, dev)[6:-4]
+            output = generate(query, model, tokenizer, dev)
             success = question["label"] == output
             result = {
                 "id": question["id"],
@@ -241,7 +256,7 @@ def main():
         add_dataset(dataset)
     combine_datasets(1, 2)  # Animal+Person-Simple
     combine_datasets(3, 0)  # Person+Animal-Simple
-    for model in datasets:
+    for model in models:
         for dataset in dataset_names:
             test_model(model, dataset, test)
     print_results()

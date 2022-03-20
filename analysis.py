@@ -1,4 +1,3 @@
-import ast
 import json
 import os
 from collections import Counter
@@ -29,6 +28,7 @@ datasets = generate.datasets
 models = datasets + [
     "Person+Animal-Simple",
     "Animal+Person-Simple",
+    "Untrained",
 ]
 
 
