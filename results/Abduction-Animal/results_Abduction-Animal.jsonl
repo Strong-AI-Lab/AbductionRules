@@ -1,10 +1,10 @@
-{"id": "Abduction-Animal-2441-Q1", "label": "The mouse is nice.", "answer": "The mouse is nice.", "success": true}
-{"id": "Abduction-Animal-2441-Q2", "label": "The mouse is nice.", "answer": "The mouse is nice.", "success": true}
-{"id": "Abduction-Animal-2441-Q3", "label": "The leopard is lazy.", "answer": "The leopard is lazy.", "success": true}
-{"id": "Abduction-Animal-2441-Q4", "label": "The leopard is lazy.", "answer": "The leopard is lazy.", "success": true}
-{"id": "Abduction-Animal-2441-Q5", "label": "The tiger is big.", "answer": "The tiger is big.", "success": true}
-{"id": "Abduction-Animal-2441-Q6", "label": "The tiger is big.", "answer": "The tiger is big.", "success": true}
-{"id": "Abduction-Animal-2441-Q7", "label": "The cat is cute.", "answer": "The cat is cute.", "success": true}
-{"id": "Abduction-Animal-2441-Q8", "label": "The cat is cute.", "answer": "The cat is cute.", "success": true}
-{"id": "Abduction-Animal-2441-Q9", "label": "The leopard visits the cat.", "answer": "The leopard visits the cat.", "success": true}
-{"id": "Abduction-Animal-2441-Q10", "label": "The leopard visits the cat.", "answer": "The leopard visits the cat.", "success": true}
+{"id": "Abduction-Animal-158-Q1", "label": "The bald eagle is boring.", "answer": "The bald eagle is dull.", "success": false}
+{"id": "Abduction-Animal-158-Q2", "label": "The bald eagle is boring.", "answer": "The bald eagle is dull.", "success": false}
+{"id": "Abduction-Animal-158-Q3", "label": "The dinosaur is big.", "answer": "The dinosaur is big.", "success": true}
+{"id": "Abduction-Animal-158-Q4", "label": "The dinosaur is big.", "answer": "The dinosaur is awful.", "success": false}
+{"id": "Abduction-Animal-158-Q5", "label": "The dog is kind.", "answer": "The dog is kind.", "success": true}
+{"id": "Abduction-Animal-158-Q6", "label": "The dog is kind.", "answer": "The dog is kind.", "success": true}
+{"id": "Abduction-Animal-158-Q7", "label": "The squirrel is furry.", "answer": "The squirrel is beautiful.", "success": false}
+{"id": "Abduction-Animal-158-Q8", "label": "The squirrel is furry.", "answer": "The squirrel is beautiful.", "success": false}
+{"id": "Abduction-Animal-158-Q9", "label": "The bald eagle sees the squirrel.", "answer": "The bald eagle sees the squirrel.", "success": true}
+{"id": "Abduction-Animal-158-Q10", "label": "The bald eagle sees the squirrel.", "answer": "The bald eagle sees the squirrel.", "success": true}

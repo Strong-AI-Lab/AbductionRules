@@ -1,10 +1,10 @@
-{"id": "Abduction-Animal-Simple-2670-Q1", "label": "The hamster is quiet.", "answer": "is quiet.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q2", "label": "The hamster is quiet.", "answer": "Erin is quiet.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q3", "label": "The leopard is slow.", "answer": "Charlie is lazy.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q4", "label": "The leopard is slow.", "answer": "Charlie is lazy.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q5", "label": "The cheetah is obese.", "answer": "Erin is obese.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q6", "label": "The cheetah is obese.", "answer": "Erin is obese.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q7", "label": "The squirrel is funny.", "answer": "Erin is quiet.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q8", "label": "The squirrel is funny.", "answer": "Fiona is quiet.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q9", "label": "The leopard chases the squirrel.", "answer": "Charlie is chase.", "success": false}
-{"id": "Abduction-Animal-Simple-2670-Q10", "label": "The leopard chases the squirrel.", "answer": "Charlie is chase.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q1", "label": "The falcon is sleepy.", "answer": "Fiona is quiet.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q2", "label": "The falcon is sleepy.", "answer": "Fiona is sleep.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q3", "label": "The bear is awful.", "answer": "Erin is huge.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q4", "label": "The bear is awful.", "answer": "Erin is huge.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q5", "label": "The dog is smart.", "answer": "Erin is smart.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q6", "label": "The dog is smart.", "answer": "Erin is smart.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q7", "label": "The rabbit is small.", "answer": "is smart.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q8", "label": "The rabbit is small.", "answer": "is smart.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q9", "label": "The falcon likes the rabbit.", "answer": "Fiona is lazy.", "success": false}
+{"id": "Abduction-Animal-Simple-3967-Q10", "label": "The falcon likes the rabbit.", "answer": "Fiona is high.", "success": false}

@@ -417,6 +417,7 @@ def generate_dataset(logic="abduction", domain="animal", extra_rules=False):
                     "text": questions[index],
                     "label": labels[index],
                     "QCat": ["0", "0_0"][index % 2],
+                    "logic": logic,
                 }
                 for index in range(len(questions))
             ],

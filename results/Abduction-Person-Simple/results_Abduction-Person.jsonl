@@ -1,8 +1,8 @@
-{"id": "Abduction-Person-Simple-1549-Q1", "label": "Harry is huge.", "answer": "Harry is high.", "success": false}
-{"id": "Abduction-Person-Simple-1549-Q2", "label": "Harry is huge.", "answer": "Harry is high.", "success": false}
-{"id": "Abduction-Person-Simple-1549-Q3", "label": "Dave is tiny.", "answer": "Dave is tiny.", "success": true}
-{"id": "Abduction-Person-Simple-1549-Q4", "label": "Dave is tiny.", "answer": "Dave is tiny.", "success": true}
-{"id": "Abduction-Person-Simple-1549-Q5", "label": "Erin is wealthy.", "answer": "Erin is wealthy.", "success": true}
-{"id": "Abduction-Person-Simple-1549-Q6", "label": "Erin is wealthy.", "answer": "Erin is wealthy.", "success": true}
-{"id": "Abduction-Person-Simple-1549-Q7", "label": "Anne is imperfect.", "answer": "Anne is imperfect.", "success": true}
-{"id": "Abduction-Person-Simple-1549-Q8", "label": "Anne is imperfect.", "answer": "Anne is imperfect.", "success": true}
+{"id": "Abduction-Person-Simple-3-Q1", "label": "Anne is small.", "answer": "Anne is thin.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q2", "label": "Anne is small.", "answer": "Anne is thin.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q3", "label": "Alan is wealthy.", "answer": "Alan is smart.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q4", "label": "Alan is wealthy.", "answer": "Alan is smart.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q5", "label": "Bob is huge.", "answer": "Bob is big.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q6", "label": "Bob is huge.", "answer": "Bob is big.", "success": false}
+{"id": "Abduction-Person-Simple-3-Q7", "label": "Fiona is sad.", "answer": "Fiona is sad.", "success": true}
+{"id": "Abduction-Person-Simple-3-Q8", "label": "Fiona is sad.", "answer": "Fiona is sad.", "success": true}

@@ -1,8 +1,8 @@
-{"id": "Abduction-Person-2919-Q1", "label": "Charlie is heavy.", "answer": "Charlie is heavy.", "success": true}
-{"id": "Abduction-Person-2919-Q2", "label": "Charlie is heavy.", "answer": "Charlie is heavy.", "success": true}
-{"id": "Abduction-Person-2919-Q3", "label": "Harry is little.", "answer": "Harry is little.", "success": true}
-{"id": "Abduction-Person-2919-Q4", "label": "Harry is little.", "answer": "Harry is little.", "success": true}
-{"id": "Abduction-Person-2919-Q5", "label": "Erin is clever.", "answer": "Erin is clever.", "success": true}
-{"id": "Abduction-Person-2919-Q6", "label": "Erin is clever.", "answer": "Erin is clever.", "success": true}
-{"id": "Abduction-Person-2919-Q7", "label": "Bob is rough.", "answer": "Bob is rough.", "success": true}
-{"id": "Abduction-Person-2919-Q8", "label": "Bob is rough.", "answer": "Bob is rough.", "success": true}
+{"id": "Abduction-Person-2501-Q1", "label": "Gary is small.", "answer": "Gary is small.", "success": true}
+{"id": "Abduction-Person-2501-Q2", "label": "Gary is small.", "answer": "Gary is small.", "success": true}
+{"id": "Abduction-Person-2501-Q3", "label": "Charlie is smart.", "answer": "Charlie is smart.", "success": true}
+{"id": "Abduction-Person-2501-Q4", "label": "Charlie is smart.", "answer": "Charlie is smart.", "success": true}
+{"id": "Abduction-Person-2501-Q5", "label": "Dave is big.", "answer": "Dave is big.", "success": true}
+{"id": "Abduction-Person-2501-Q6", "label": "Dave is big.", "answer": "Dave is big.", "success": true}
+{"id": "Abduction-Person-2501-Q7", "label": "Harry is rough.", "answer": "Harry is dull.", "success": false}
+{"id": "Abduction-Person-2501-Q8", "label": "Harry is rough.", "answer": "Harry is dull.", "success": false}

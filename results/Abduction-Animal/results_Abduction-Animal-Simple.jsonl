@@ -1,10 +1,10 @@
-{"id": "Abduction-Animal-2210-Q1", "label": "The rabbit is nice.", "answer": "The rabbit is nice.", "success": true}
-{"id": "Abduction-Animal-2210-Q2", "label": "The rabbit is nice.", "answer": "The rabbit is nice.", "success": true}
-{"id": "Abduction-Animal-2210-Q3", "label": "The snake is reckless.", "answer": "The snake is nice.", "success": false}
-{"id": "Abduction-Animal-2210-Q4", "label": "The snake is reckless.", "answer": "The snake is nice.", "success": false}
-{"id": "Abduction-Animal-2210-Q5", "label": "The lion is awful.", "answer": "The lion is reckless.", "success": false}
-{"id": "Abduction-Animal-2210-Q6", "label": "The lion is awful.", "answer": "The lion is reckless.", "success": false}
-{"id": "Abduction-Animal-2210-Q7", "label": "The hamster is funny.", "answer": "The hamster is smart.", "success": false}
-{"id": "Abduction-Animal-2210-Q8", "label": "The hamster is funny.", "answer": "The hamster is smart.", "success": false}
-{"id": "Abduction-Animal-2210-Q9", "label": "The snake visits the hamster.", "answer": "The snake visits the hamster.", "success": true}
-{"id": "Abduction-Animal-2210-Q10", "label": "The snake visits the hamster.", "answer": "The snake visits the hamster.", "success": true}
+{"id": "Abduction-Animal-4885-Q1", "label": "The panther is angry.", "answer": "The pancon is angry.", "success": false}
+{"id": "Abduction-Animal-4885-Q2", "label": "The panther is angry.", "answer": "The pancon is angry.", "success": false}
+{"id": "Abduction-Animal-4885-Q3", "label": "The dinosaur is fierce.", "answer": "The dinosaur is angry.", "success": false}
+{"id": "Abduction-Animal-4885-Q4", "label": "The dinosaur is fierce.", "answer": "The dinosaur is angry.", "success": false}
+{"id": "Abduction-Animal-4885-Q5", "label": "The hamster is smart.", "answer": "The hamster is heavy.", "success": false}
+{"id": "Abduction-Animal-4885-Q6", "label": "The hamster is smart.", "answer": "The hamster is heavy.", "success": false}
+{"id": "Abduction-Animal-4885-Q7", "label": "The cat is funny.", "answer": "The cat is round.", "success": false}
+{"id": "Abduction-Animal-4885-Q8", "label": "The cat is funny.", "answer": "The cat is round.", "success": false}
+{"id": "Abduction-Animal-4885-Q9", "label": "The panther sees the cat.", "answer": "The pancon is heavy.", "success": false}
+{"id": "Abduction-Animal-4885-Q10", "label": "The panther sees the cat.", "answer": "The pancon is heavy.", "success": false}

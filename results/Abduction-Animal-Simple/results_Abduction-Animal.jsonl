@@ -1,10 +1,10 @@
-{"id": "Abduction-Animal-Simple-777-Q1", "label": "The hamster is smart.", "answer": "The hamster is smart.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q2", "label": "The hamster is smart.", "answer": "The hamster is smart.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q3", "label": "The bear is dull.", "answer": "The bear is dull.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q4", "label": "The bear is dull.", "answer": "The bear is dull.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q5", "label": "The dinosaur is fierce.", "answer": "The dinosaur is strong.", "success": false}
-{"id": "Abduction-Animal-Simple-777-Q6", "label": "The dinosaur is fierce.", "answer": "The dinosaur is strong.", "success": false}
-{"id": "Abduction-Animal-Simple-777-Q7", "label": "The dog is funny.", "answer": "The dog is funny.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q8", "label": "The dog is funny.", "answer": "The dog is funny.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q9", "label": "The bear chases the dog.", "answer": "The bear chases the dog.", "success": true}
-{"id": "Abduction-Animal-Simple-777-Q10", "label": "The bear chases the dog.", "answer": "The bear chases the dog.", "success": true}
+{"id": "Abduction-Animal-Simple-1469-Q1", "label": "The lion is reckless.", "answer": "The lion is reckless.", "success": true}
+{"id": "Abduction-Animal-Simple-1469-Q2", "label": "The lion is reckless.", "answer": "The lion is reckless.", "success": true}
+{"id": "Abduction-Animal-Simple-1469-Q3", "label": "The falcon is big.", "answer": "The falcon is obese.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q4", "label": "The falcon is big.", "answer": "The falcon is obese.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q5", "label": "The hamster is quiet.", "answer": "The hamster is nice.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q6", "label": "The hamster is quiet.", "answer": "The hamster is nice.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q7", "label": "The squirrel is furry.", "answer": "The squirrel is funny.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q8", "label": "The squirrel is furry.", "answer": "The squirrel is funny.", "success": false}
+{"id": "Abduction-Animal-Simple-1469-Q9", "label": "The lion likes the squirrel.", "answer": "The lion likes the squirrel.", "success": true}
+{"id": "Abduction-Animal-Simple-1469-Q10", "label": "The lion likes the squirrel.", "answer": "The lion likes the squirrel.", "success": true}
